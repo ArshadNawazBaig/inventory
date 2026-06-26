@@ -81,7 +81,7 @@ export const PLAYGROUND_GROUPS: PlaygroundGroup[] = [
     items: [
       { slug: 'toast', name: 'Toast', ready: true },
       { slug: 'notification', name: 'Notification', ready: true },
-      { slug: 'loading', name: 'Loading', ready: false },
+      { slug: 'loading', name: 'Loading', ready: true },
       { slug: 'skeleton', name: 'Skeleton', ready: false },
     ],
   },
