@@ -1,0 +1,99 @@
+/**
+ * Registry that drives the playground sidebar. Each component on the roadmap is listed here;
+ * `ready: true` renders a real link, otherwise it shows as "soon". Flip the flag when a component
+ * ships so the sidebar stays in sync with the library (docs/README.md build order).
+ */
+export interface PlaygroundEntry {
+  slug: string;
+  name: string;
+  ready: boolean;
+}
+
+export interface PlaygroundGroup {
+  title: string;
+  items: PlaygroundEntry[];
+}
+
+export const PLAYGROUND_GROUPS: PlaygroundGroup[] = [
+  {
+    title: 'Primitives',
+    items: [{ slug: 'button', name: 'Button', ready: true }],
+  },
+  {
+    title: 'Forms',
+    items: [
+      { slug: 'input', name: 'Input', ready: true },
+      { slug: 'textarea', name: 'Textarea', ready: true },
+      { slug: 'select', name: 'Select', ready: false },
+      { slug: 'checkbox', name: 'Checkbox', ready: false },
+      { slug: 'switch', name: 'Switch', ready: false },
+      { slug: 'radio', name: 'Radio', ready: false },
+    ],
+  },
+  {
+    title: 'Display',
+    items: [
+      { slug: 'avatar', name: 'Avatar', ready: false },
+      { slug: 'badge', name: 'Badge', ready: false },
+      { slug: 'card', name: 'Card', ready: false },
+    ],
+  },
+  {
+    title: 'Overlays',
+    items: [
+      { slug: 'modal', name: 'Modal', ready: false },
+      { slug: 'dialog', name: 'Dialog', ready: false },
+      { slug: 'popover', name: 'Popover', ready: false },
+      { slug: 'tooltip', name: 'Tooltip', ready: false },
+      { slug: 'dropdown', name: 'Dropdown', ready: false },
+    ],
+  },
+  {
+    title: 'Navigation',
+    items: [
+      { slug: 'sidebar', name: 'Sidebar', ready: false },
+      { slug: 'navbar', name: 'Navbar', ready: false },
+      { slug: 'pagination', name: 'Pagination', ready: false },
+      { slug: 'breadcrumb', name: 'Breadcrumb', ready: false },
+      { slug: 'tabs', name: 'Tabs', ready: false },
+      { slug: 'accordion', name: 'Accordion', ready: false },
+    ],
+  },
+  {
+    title: 'Data',
+    items: [
+      { slug: 'table', name: 'Table', ready: false },
+      { slug: 'data-grid', name: 'DataGrid', ready: false },
+      { slug: 'charts', name: 'Charts', ready: false },
+    ],
+  },
+  {
+    title: 'Rich inputs',
+    items: [
+      { slug: 'file-upload', name: 'File Upload', ready: false },
+      { slug: 'image-upload', name: 'Image Upload', ready: false },
+      { slug: 'date-picker', name: 'Date Picker', ready: false },
+      { slug: 'calendar', name: 'Calendar', ready: false },
+    ],
+  },
+  {
+    title: 'Feedback',
+    items: [
+      { slug: 'toast', name: 'Toast', ready: false },
+      { slug: 'notification', name: 'Notification', ready: false },
+      { slug: 'loading', name: 'Loading', ready: false },
+      { slug: 'skeleton', name: 'Skeleton', ready: false },
+    ],
+  },
+  {
+    title: 'Search & command',
+    items: [
+      { slug: 'search', name: 'Search', ready: false },
+      { slug: 'filters', name: 'Filters', ready: false },
+      { slug: 'command-palette', name: 'Command Palette', ready: false },
+    ],
+  },
+];
+
+export const READY_COUNT = PLAYGROUND_GROUPS.flatMap((g) => g.items).filter((i) => i.ready).length;
+export const TOTAL_COUNT = PLAYGROUND_GROUPS.flatMap((g) => g.items).length;

@@ -34,6 +34,23 @@ is the first and doubles as the spec template.
 |-----------|--------|
 | [Button](./components/button.md) | ✅ Implemented (12 tests + stories) |
 | [Input](./components/input.md) | ✅ Implemented (11 tests + stories) |
+| [Textarea](./components/textarea.md) | ✅ Implemented (11 tests + stories) |
+| [Select](./components/select.md) | 🟡 Spec — awaiting approval (Batch 1 · forms) |
+| [Checkbox](./components/checkbox.md) | 🟡 Spec — awaiting approval (Batch 1 · forms) |
+| [Switch](./components/switch.md) | 🟡 Spec — awaiting approval (Batch 1 · forms) |
+| [Radio](./components/radio.md) | 🟡 Spec — awaiting approval (Batch 1 · forms) |
+
+**Component build order (specs in strict list order, delivered in batches):**
+
+1. **Batch 1 — Forms:** Textarea · Select · Checkbox · Switch · Radio *(+ `Field` wrapper, the shared
+   label/error/aria host every control composes into — spec to follow this batch)*
+2. **Batch 2 — Display:** Avatar · Badge · Card
+3. **Batch 3 — Overlays** (one Radix portal/focus-trap foundation): Modal · Dialog · Popover · Tooltip · Dropdown
+4. **Batch 4 — Navigation:** Sidebar · Navbar · Pagination · Breadcrumb · Tabs · Accordion
+5. **Batch 5 — Data:** Table · DataGrid · Charts
+6. **Batch 6 — Inputs (rich):** File Upload · Image Upload · Date Picker · Calendar
+7. **Batch 7 — Feedback:** Toast · Notification · Loading · Skeleton
+8. **Batch 8 — Search & command:** Search · Filters · Command Palette
 
 ## Delivery process
 
