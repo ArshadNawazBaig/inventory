@@ -12,3 +12,4 @@ export * from './dialog';
 export * from './modal';
 export * from './popover';
 export * from './tooltip';
+export * from './dropdown';
