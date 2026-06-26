@@ -37,7 +37,7 @@ is the first and doubles as the spec template.
 | [Textarea](./components/textarea.md) | ✅ Implemented (11 tests + stories) |
 | [Select](./components/select.md) | ✅ Implemented (8 tests + stories) |
 | [Checkbox](./components/checkbox.md) | ✅ Implemented (9 tests + stories) |
-| [Switch](./components/switch.md) | 🟡 Spec — awaiting approval (Batch 1 · forms) |
+| [Switch](./components/switch.md) | ✅ Implemented (7 tests + stories) |
 | [Radio](./components/radio.md) | 🟡 Spec — awaiting approval (Batch 1 · forms) |
 
 **Component build order (specs in strict list order, delivered in batches):**
