@@ -43,7 +43,7 @@ export const PLAYGROUND_GROUPS: PlaygroundGroup[] = [
     items: [
       { slug: 'modal', name: 'Modal', ready: true },
       { slug: 'dialog', name: 'Dialog', ready: true },
-      { slug: 'popover', name: 'Popover', ready: false },
+      { slug: 'popover', name: 'Popover', ready: true },
       { slug: 'tooltip', name: 'Tooltip', ready: false },
       { slug: 'dropdown', name: 'Dropdown', ready: false },
     ],
