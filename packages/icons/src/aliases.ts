@@ -36,6 +36,7 @@ export {
   Filter as FilterIcon,
   Search as SearchIcon,
   Ellipsis as MoreIcon,
+  ChevronDown as ChevronDownIcon,
   ChevronLeft as ChevronLeftIcon,
   ChevronRight as ChevronRightIcon,
   ChevronsLeft as ChevronsLeftIcon,

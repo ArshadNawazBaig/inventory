@@ -56,7 +56,7 @@ export const PLAYGROUND_GROUPS: PlaygroundGroup[] = [
       { slug: 'pagination', name: 'Pagination', ready: true },
       { slug: 'breadcrumb', name: 'Breadcrumb', ready: true },
       { slug: 'tabs', name: 'Tabs', ready: true },
-      { slug: 'accordion', name: 'Accordion', ready: false },
+      { slug: 'accordion', name: 'Accordion', ready: true },
     ],
   },
   {

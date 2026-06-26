@@ -52,6 +52,7 @@ is the first and doubles as the spec template.
 | [Pagination](./components/pagination.md) | ✅ Implemented (12 tests + stories) |
 | [Breadcrumb](./components/breadcrumb.md) | ✅ Implemented (8 tests + stories) |
 | [Tabs](./components/tabs.md) | ✅ Implemented (7 tests + stories) |
+| [Accordion](./components/accordion.md) | ✅ Implemented (6 tests + stories) |
 
 **Component build order (specs in strict list order, delivered in batches):**
 

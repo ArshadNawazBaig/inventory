@@ -107,6 +107,28 @@
   --ease-out: cubic-bezier(0, 0, 0.2, 1);
   --ease-in: cubic-bezier(0.4, 0, 1, 1);
 
+  /* Animations (Radix collapsible content; honor reduced-motion via §4 base layer) */
+  --animate-accordion-down: accordion-down var(--duration-base) var(--ease-standard);
+  --animate-accordion-up: accordion-up var(--duration-base) var(--ease-standard);
+
+  @keyframes accordion-down {
+    from {
+      height: 0;
+    }
+    to {
+      height: var(--radix-accordion-content-height);
+    }
+  }
+
+  @keyframes accordion-up {
+    from {
+      height: var(--radix-accordion-content-height);
+    }
+    to {
+      height: 0;
+    }
+  }
+
   /* Breakpoints (explicit) */
   --breakpoint-sm: 40rem;
   --breakpoint-md: 48rem;
