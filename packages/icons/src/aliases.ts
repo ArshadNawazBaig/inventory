@@ -31,6 +31,8 @@ export {
   Moon as MoonIcon,
   Component as ComponentIcon,
   Calendar as CalendarIcon,
+  File as FileIcon,
+  CloudUpload as UploadCloudIcon,
   // Actions
   Plus as AddIcon,
   Pencil as EditIcon,

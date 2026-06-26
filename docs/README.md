@@ -58,6 +58,7 @@ is the first and doubles as the spec template.
 | [Charts](./components/charts.md) | ✅ Implemented (7 tests + stories) |
 | [Calendar](./components/calendar.md) | ✅ Implemented (7 tests + stories) |
 | [Date Picker](./components/date-picker.md) | ✅ Implemented (Popover + Calendar · 9 tests + stories) |
+| [File Upload](./components/file-upload.md) | ✅ Implemented (native dropzone · 11 tests + stories) |
 
 **Component build order (specs in strict list order, delivered in batches):**
 

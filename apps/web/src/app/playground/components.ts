@@ -70,7 +70,7 @@ export const PLAYGROUND_GROUPS: PlaygroundGroup[] = [
   {
     title: 'Rich inputs',
     items: [
-      { slug: 'file-upload', name: 'File Upload', ready: false },
+      { slug: 'file-upload', name: 'File Upload', ready: true },
       { slug: 'image-upload', name: 'Image Upload', ready: false },
       { slug: 'date-picker', name: 'Date Picker', ready: true },
       { slug: 'calendar', name: 'Calendar', ready: true },
