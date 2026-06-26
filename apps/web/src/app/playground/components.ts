@@ -63,7 +63,7 @@ export const PLAYGROUND_GROUPS: PlaygroundGroup[] = [
     title: 'Data',
     items: [
       { slug: 'table', name: 'Table', ready: true },
-      { slug: 'data-grid', name: 'DataGrid', ready: false },
+      { slug: 'data-grid', name: 'DataGrid', ready: true },
       { slug: 'charts', name: 'Charts', ready: false },
     ],
   },

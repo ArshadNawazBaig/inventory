@@ -37,10 +37,12 @@ export {
   Search as SearchIcon,
   Ellipsis as MoreIcon,
   ChevronDown as ChevronDownIcon,
+  ChevronUp as ChevronUpIcon,
   ChevronLeft as ChevronLeftIcon,
   ChevronRight as ChevronRightIcon,
   ChevronsLeft as ChevronsLeftIcon,
   ChevronsRight as ChevronsRightIcon,
+  ChevronsUpDown as ChevronsUpDownIcon,
   // Status
   CircleCheck as SuccessIcon,
   TriangleAlert as WarningIcon,

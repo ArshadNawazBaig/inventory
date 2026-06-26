@@ -54,6 +54,7 @@ is the first and doubles as the spec template.
 | [Tabs](./components/tabs.md) | ✅ Implemented (7 tests + stories) |
 | [Accordion](./components/accordion.md) | ✅ Implemented (6 tests + stories) |
 | [Table](./components/table.md) | ✅ Implemented (6 tests + stories) |
+| [DataGrid](./components/data-grid.md) | ✅ Implemented (8 tests + stories) |
 
 **Component build order (specs in strict list order, delivered in batches):**
 
