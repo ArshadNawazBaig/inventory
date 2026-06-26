@@ -21,6 +21,7 @@ export {
   ShoppingCart as PurchaseOrderIcon,
   ShoppingBag as SalesOrderIcon,
   Truck as ShipmentIcon,
+  User as UserIcon,
   Users as MembersIcon,
   Bell as NotificationIcon,
   Settings as SettingsIcon,

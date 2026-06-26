@@ -39,6 +39,7 @@ is the first and doubles as the spec template.
 | [Checkbox](./components/checkbox.md) | ✅ Implemented (9 tests + stories) |
 | [Switch](./components/switch.md) | ✅ Implemented (7 tests + stories) |
 | [Radio](./components/radio.md) | ✅ Implemented (7 tests + stories) |
+| [Avatar](./components/avatar.md) | ✅ Implemented (9 tests + stories) |
 
 **Component build order (specs in strict list order, delivered in batches):**
 
