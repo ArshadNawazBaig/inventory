@@ -36,6 +36,10 @@ export {
   Filter as FilterIcon,
   Search as SearchIcon,
   Ellipsis as MoreIcon,
+  ChevronLeft as ChevronLeftIcon,
+  ChevronRight as ChevronRightIcon,
+  ChevronsLeft as ChevronsLeftIcon,
+  ChevronsRight as ChevronsRightIcon,
   // Status
   CircleCheck as SuccessIcon,
   TriangleAlert as WarningIcon,

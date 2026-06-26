@@ -53,7 +53,7 @@ export const PLAYGROUND_GROUPS: PlaygroundGroup[] = [
     items: [
       { slug: 'sidebar', name: 'Sidebar', ready: true },
       { slug: 'navbar', name: 'Navbar', ready: true },
-      { slug: 'pagination', name: 'Pagination', ready: false },
+      { slug: 'pagination', name: 'Pagination', ready: true },
       { slug: 'breadcrumb', name: 'Breadcrumb', ready: false },
       { slug: 'tabs', name: 'Tabs', ready: false },
       { slug: 'accordion', name: 'Accordion', ready: false },
