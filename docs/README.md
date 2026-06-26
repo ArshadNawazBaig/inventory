@@ -48,6 +48,7 @@ is the first and doubles as the spec template.
 | [Tooltip](./components/tooltip.md) | ✅ Implemented (6 tests + stories) |
 | [Dropdown](./components/dropdown.md) | ✅ Implemented (6 tests + stories) |
 | [Sidebar](./components/sidebar.md) | ✅ Implemented (5 tests + stories) |
+| [Navbar](./components/navbar.md) | ✅ Implemented (5 tests + stories) |
 
 **Component build order (specs in strict list order, delivered in batches):**
 
