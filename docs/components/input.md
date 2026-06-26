@@ -3,7 +3,7 @@
 | Field | Value |
 |-------|-------|
 | **Component** | `Input` (`@stockflow/ui` → `primitives/input`) |
-| **Status** | 🟡 Awaiting approval — **design only, not implemented** |
+| **Status** | ✅ Implemented — control + 11 tests + stories in `packages/ui` |
 | **Owner** | Frontend Lead / UI Engineer |
 | **Date** | 2026-06-26 |
 | **Depends on** | [DESIGN_SYSTEM.md](../DESIGN_SYSTEM.md) · [ICON_SYSTEM.md](../ICON_SYSTEM.md) · [COMPONENT_LIBRARY.md](../COMPONENT_LIBRARY.md) · [button.md](./button.md) (template) |
@@ -156,6 +156,10 @@ Defined for every variant × size:
   with `tabular-nums`.
 - **i18n/RTL:** respects `dir`; adornment sides flip in RTL.
 - **Paste/maxLength:** honor `maxLength`; optional character counter is rendered by `Field`.
+- **Client component:** Input is `"use client"` (needs state for clear/password). Because the
+  `leadingIcon`/`trailingIcon` props take a component *function* (`LucideIcon`), a **Server
+  Component cannot pass them across the boundary** — compose Input (and its icon props) inside a
+  client component/page. Forms are interactive, so this is the normal case.
 
 ---
 

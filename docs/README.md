@@ -33,7 +33,7 @@ is the first and doubles as the spec template.
 | Component | Status |
 |-----------|--------|
 | [Button](./components/button.md) | ✅ Implemented (12 tests + stories) |
-| [Input](./components/input.md) | 🟡 Awaiting approval (design only) |
+| [Input](./components/input.md) | ✅ Implemented (11 tests + stories) |
 
 ## Delivery process
 

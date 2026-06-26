@@ -17,6 +17,8 @@ export {
   Minus,
   Search,
   Loader2,
+  Eye,
+  EyeOff,
 } from 'lucide-react';
 
 // Semantic / domain aliases.
