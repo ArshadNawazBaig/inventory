@@ -15,6 +15,7 @@ import { ChevronDownIcon, ChevronUpIcon, ChevronsUpDownIcon } from '@stockflow/i
 import { cn } from '../../lib/cn';
 import { Checkbox } from '../checkbox';
 import { Pagination } from '../pagination';
+import { Skeleton } from '../skeleton';
 import {
   Table,
   TableBody,
@@ -196,7 +197,7 @@ export function DataGrid<TData>({
                 <TableRow key={`skeleton-${rowIndex}`}>
                   {Array.from({ length: columnCount }, (_, cellIndex) => (
                     <TableCell key={cellIndex}>
-                      <div className="h-4 w-full max-w-[140px] animate-pulse rounded bg-muted" />
+                      <Skeleton variant="text" className="max-w-[140px]" />
                     </TableCell>
                   ))}
                 </TableRow>

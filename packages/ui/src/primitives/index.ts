@@ -29,3 +29,4 @@ export * from './image-upload';
 export * from './toast';
 export * from './notification';
 export * from './loading';
+export * from './skeleton';

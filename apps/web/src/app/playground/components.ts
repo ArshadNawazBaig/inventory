@@ -82,7 +82,7 @@ export const PLAYGROUND_GROUPS: PlaygroundGroup[] = [
       { slug: 'toast', name: 'Toast', ready: true },
       { slug: 'notification', name: 'Notification', ready: true },
       { slug: 'loading', name: 'Loading', ready: true },
-      { slug: 'skeleton', name: 'Skeleton', ready: false },
+      { slug: 'skeleton', name: 'Skeleton', ready: true },
     ],
   },
   {
