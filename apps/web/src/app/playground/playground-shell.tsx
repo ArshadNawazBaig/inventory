@@ -1,18 +1,56 @@
 'use client';
 
-import { useEffect, useState, type ReactNode } from 'react';
+import { useEffect, useMemo, useState, type ReactNode } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Button, cn } from '@stockflow/ui';
+import { MoonIcon, SunIcon } from '@stockflow/icons';
+import {
+  Avatar,
+  Badge,
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+  Button,
+  Navbar,
+  NavbarActions,
+  NavbarSpacer,
+  Sidebar,
+  SidebarContent,
+  SidebarFooter,
+  SidebarGroup,
+  SidebarGroupLabel,
+  SidebarHeader,
+  SidebarMenu,
+  SidebarMenuButton,
+  SidebarMenuItem,
+  SidebarProvider,
+  SidebarTrigger,
+} from '@stockflow/ui';
 import { PLAYGROUND_GROUPS, READY_COUNT, TOTAL_COUNT } from './components';
 
 const STORAGE_KEY = 'sf-playground-theme';
 type Theme = 'light' | 'dark';
 
+/** Monogram used as the row "icon" so the collapsed rail stays meaningful (no per-component icons). */
+function Monogram({ label }: { label: string }) {
+  return (
+    <span
+      aria-hidden="true"
+      className="flex size-5 shrink-0 items-center justify-center text-xs font-semibold"
+    >
+      {label.charAt(0)}
+    </span>
+  );
+}
+
 /**
- * Persistent playground chrome: a component sidebar + a dark-mode toggle. Lives in the route layout
- * so theme state and scroll position survive navigation between component routes. The toggle puts
- * `.dark` on the wrapper; because every component is token-driven, all of them re-theme at once.
+ * Persistent playground chrome — now built from our own components: an app-shell `Sidebar` (collapsible
+ * icon rail) for component navigation and a `Navbar` with a `Breadcrumb`, theme toggle, and `Avatar`.
+ * Theme state lives here so it survives navigation; the `.dark` class on the wrapper re-themes every
+ * token-driven component at once.
  */
 export function PlaygroundShell({ children }: { children: ReactNode }) {
   const pathname = usePathname();
@@ -32,69 +70,120 @@ export function PlaygroundShell({ children }: { children: ReactNode }) {
     });
   };
 
+  const current = useMemo(
+    () => PLAYGROUND_GROUPS.flatMap((g) => g.items).find((i) => pathname === `/playground/${i.slug}`),
+    [pathname],
+  );
+
   return (
     <div className={theme === 'dark' ? 'dark' : undefined}>
-      <div className="flex min-h-screen bg-background text-foreground">
-        <aside className="sticky top-0 flex h-screen w-64 shrink-0 flex-col border-r border-border bg-card text-card-foreground">
-          <div className="border-b border-border p-4">
-            <Link href="/playground" className="block">
-              <p className="text-sm font-semibold">StockFlow UI</p>
-              <p className="text-xs text-muted-foreground">
-                {READY_COUNT} of {TOTAL_COUNT} components
-              </p>
+      <SidebarProvider className="bg-background text-foreground">
+        <Sidebar collapsible="icon" aria-label="Component navigation" className="sticky top-0">
+          <SidebarHeader>
+            <Link
+              href="/playground"
+              className="flex items-center gap-2 px-2 py-1 group-data-[state=collapsed]/sidebar:justify-center group-data-[state=collapsed]/sidebar:px-0"
+            >
+              <span className="flex size-7 shrink-0 items-center justify-center rounded-md bg-primary text-xs font-bold text-primary-foreground">
+                SF
+              </span>
+              <span className="flex flex-col group-data-[state=collapsed]/sidebar:sr-only">
+                <span className="text-sm font-semibold leading-tight">StockFlow UI</span>
+                <span className="text-xs text-muted-foreground">
+                  {READY_COUNT} of {TOTAL_COUNT} components
+                </span>
+              </span>
             </Link>
-          </div>
+          </SidebarHeader>
 
-          <nav className="flex-1 overflow-y-auto p-3">
+          <SidebarContent>
             {PLAYGROUND_GROUPS.map((group) => (
-              <div key={group.title} className="mb-4">
-                <p className="px-2 pb-1 text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
-                  {group.title}
-                </p>
-                <ul className="space-y-0.5">
+              <SidebarGroup key={group.title}>
+                <SidebarGroupLabel>{group.title}</SidebarGroupLabel>
+                <SidebarMenu>
                   {group.items.map((item) => {
                     const href = `/playground/${item.slug}`;
                     const active = pathname === href;
                     return (
-                      <li key={item.slug}>
+                      <SidebarMenuItem key={item.slug}>
                         {item.ready ? (
-                          <Link
-                            href={href}
-                            aria-current={active ? 'page' : undefined}
-                            className={cn(
-                              'block rounded-md px-2 py-1.5 text-sm transition-colors',
-                              active
-                                ? 'bg-accent font-medium text-accent-foreground'
-                                : 'text-foreground hover:bg-accent hover:text-accent-foreground',
-                            )}
-                          >
-                            {item.name}
-                          </Link>
+                          <SidebarMenuButton asChild active={active} tooltip={item.name}>
+                            <Link href={href} aria-current={active ? 'page' : undefined}>
+                              <Monogram label={item.name} />
+                              <span>{item.name}</span>
+                            </Link>
+                          </SidebarMenuButton>
                         ) : (
-                          <span className="flex items-center justify-between rounded-md px-2 py-1.5 text-sm text-muted-foreground/40">
-                            {item.name}
-                            <span className="text-[10px] uppercase tracking-wide">soon</span>
-                          </span>
+                          <SidebarMenuButton
+                            disabled
+                            tooltip={`${item.name} — coming soon`}
+                            className="opacity-50"
+                          >
+                            <Monogram label={item.name} />
+                            <span>{item.name}</span>
+                            <Badge appearance="soft" tone="neutral" size="sm" className="ml-auto">
+                              soon
+                            </Badge>
+                          </SidebarMenuButton>
                         )}
-                      </li>
+                      </SidebarMenuItem>
                     );
                   })}
-                </ul>
-              </div>
+                </SidebarMenu>
+              </SidebarGroup>
             ))}
-          </nav>
+          </SidebarContent>
 
-          <div className="border-t border-border p-3">
-            <Button variant="outline" fullWidth onClick={toggleTheme}>
-              {theme === 'dark' ? 'Light mode' : 'Dark mode'}
-            </Button>
-          </div>
-        </aside>
+          <SidebarFooter>
+            <p className="px-2 text-xs text-muted-foreground group-data-[state=collapsed]/sidebar:sr-only">
+              v0.1 · token-driven
+            </p>
+          </SidebarFooter>
+        </Sidebar>
 
-        <main className="flex-1 overflow-x-hidden p-10">
-          <div className="mx-auto max-w-4xl">{children}</div>
-        </main>
-      </div>
+        <div className="flex min-h-svh min-w-0 flex-1 flex-col">
+          <Navbar>
+            <SidebarTrigger />
+            <Breadcrumb className="min-w-0">
+              <BreadcrumbList className="flex-nowrap">
+                <BreadcrumbItem>
+                  <BreadcrumbLink asChild>
+                    <Link href="/playground">Playground</Link>
+                  </BreadcrumbLink>
+                </BreadcrumbItem>
+                {current ? (
+                  <>
+                    <BreadcrumbSeparator />
+                    <BreadcrumbItem>
+                      <BreadcrumbPage>{current.name}</BreadcrumbPage>
+                    </BreadcrumbItem>
+                  </>
+                ) : null}
+              </BreadcrumbList>
+            </Breadcrumb>
+            <NavbarSpacer />
+            <NavbarActions>
+              <Button
+                variant="ghost"
+                size="icon"
+                aria-label={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
+                onClick={toggleTheme}
+              >
+                {theme === 'dark' ? (
+                  <SunIcon className="size-4" />
+                ) : (
+                  <MoonIcon className="size-4" />
+                )}
+              </Button>
+              <Avatar size="sm" name="StockFlow Team" />
+            </NavbarActions>
+          </Navbar>
+
+          <main className="flex-1 overflow-x-hidden p-6 lg:p-10">
+            <div className="mx-auto max-w-4xl">{children}</div>
+          </main>
+        </div>
+      </SidebarProvider>
     </div>
   );
 }

@@ -27,6 +27,9 @@ export {
   Settings as SettingsIcon,
   Menu as MenuIcon,
   PanelLeft as PanelLeftIcon,
+  Sun as SunIcon,
+  Moon as MoonIcon,
+  Component as ComponentIcon,
   // Actions
   Plus as AddIcon,
   Pencil as EditIcon,
