@@ -57,6 +57,7 @@ is the first and doubles as the spec template.
 | [DataGrid](./components/data-grid.md) | ✅ Implemented (8 tests + stories) |
 | [Charts](./components/charts.md) | ✅ Implemented (7 tests + stories) |
 | [Calendar](./components/calendar.md) | ✅ Implemented (7 tests + stories) |
+| [Date Picker](./components/date-picker.md) | ✅ Implemented (Popover + Calendar · 9 tests + stories) |
 
 **Component build order (specs in strict list order, delivered in batches):**
 

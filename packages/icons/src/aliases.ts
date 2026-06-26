@@ -30,6 +30,7 @@ export {
   Sun as SunIcon,
   Moon as MoonIcon,
   Component as ComponentIcon,
+  Calendar as CalendarIcon,
   // Actions
   Plus as AddIcon,
   Pencil as EditIcon,
@@ -38,6 +39,7 @@ export {
   Upload as ImportIcon,
   Filter as FilterIcon,
   Search as SearchIcon,
+  X as XIcon,
   Ellipsis as MoreIcon,
   ChevronDown as ChevronDownIcon,
   ChevronUp as ChevronUpIcon,
