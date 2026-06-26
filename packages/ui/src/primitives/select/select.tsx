@@ -103,7 +103,7 @@ export const SelectContent = forwardRef<
         ref={ref}
         position={position}
         className={cn(
-          'relative z-50 max-h-[var(--radix-select-content-available-height)] min-w-[8rem] overflow-hidden rounded-md border border-border bg-popover text-popover-foreground shadow-md',
+          'relative z-50 max-h-(--radix-select-content-available-height) min-w-32 overflow-hidden rounded-md border border-border bg-popover text-popover-foreground shadow-md',
           position === 'popper' &&
             'data-[side=bottom]:translate-y-1 data-[side=top]:-translate-y-1',
           className,
@@ -114,7 +114,7 @@ export const SelectContent = forwardRef<
         <SelectPrimitive.Viewport
           className={cn(
             'p-1',
-            position === 'popper' && 'w-full min-w-[var(--radix-select-trigger-width)]',
+            position === 'popper' && 'w-full min-w-(--radix-select-trigger-width)',
           )}
         >
           {children}
@@ -156,7 +156,7 @@ export const SelectItem = forwardRef<ElementRef<typeof SelectPrimitive.Item>, Se
         className={cn(
           'relative flex w-full cursor-default select-none items-center gap-2 rounded-sm py-1.5 pl-2 pr-8 text-sm outline-none',
           'focus:bg-accent focus:text-accent-foreground',
-          'data-[disabled]:pointer-events-none data-[disabled]:opacity-50',
+          'data-disabled:pointer-events-none data-disabled:opacity-50',
           className,
         )}
         {...props}
