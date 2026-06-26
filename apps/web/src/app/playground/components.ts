@@ -73,7 +73,7 @@ export const PLAYGROUND_GROUPS: PlaygroundGroup[] = [
       { slug: 'file-upload', name: 'File Upload', ready: false },
       { slug: 'image-upload', name: 'Image Upload', ready: false },
       { slug: 'date-picker', name: 'Date Picker', ready: false },
-      { slug: 'calendar', name: 'Calendar', ready: false },
+      { slug: 'calendar', name: 'Calendar', ready: true },
     ],
   },
   {

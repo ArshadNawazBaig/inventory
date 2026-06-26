@@ -22,3 +22,4 @@ export * from './accordion';
 export * from './table';
 export * from './data-grid';
 export * from './chart';
+export * from './calendar';

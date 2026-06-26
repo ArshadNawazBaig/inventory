@@ -56,6 +56,7 @@ is the first and doubles as the spec template.
 | [Table](./components/table.md) | ✅ Implemented (6 tests + stories) |
 | [DataGrid](./components/data-grid.md) | ✅ Implemented (8 tests + stories) |
 | [Charts](./components/charts.md) | ✅ Implemented (7 tests + stories) |
+| [Calendar](./components/calendar.md) | ✅ Implemented (7 tests + stories) |
 
 **Component build order (specs in strict list order, delivered in batches):**
 
