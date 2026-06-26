@@ -42,7 +42,7 @@ export const PLAYGROUND_GROUPS: PlaygroundGroup[] = [
     title: 'Overlays',
     items: [
       { slug: 'modal', name: 'Modal', ready: false },
-      { slug: 'dialog', name: 'Dialog', ready: false },
+      { slug: 'dialog', name: 'Dialog', ready: true },
       { slug: 'popover', name: 'Popover', ready: false },
       { slug: 'tooltip', name: 'Tooltip', ready: false },
       { slug: 'dropdown', name: 'Dropdown', ready: false },

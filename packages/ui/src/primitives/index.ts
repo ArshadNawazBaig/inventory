@@ -8,3 +8,4 @@ export * from './radio';
 export * from './avatar';
 export * from './badge';
 export * from './card';
+export * from './dialog';
