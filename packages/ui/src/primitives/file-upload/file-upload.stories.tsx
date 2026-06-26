@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import type { Meta, StoryObj } from '@storybook/react';
-import { FileUpload, type UploadFile } from './file-upload';
+import { FileUpload } from './file-upload';
+import type { UploadFile } from './use-file-upload';
 
 const meta: Meta<typeof FileUpload> = {
   title: 'Inputs/FileUpload',

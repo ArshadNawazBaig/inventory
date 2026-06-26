@@ -1,48 +1,15 @@
 'use client';
 
-import {
-  useId,
-  useRef,
-  useState,
-  type DragEvent,
-  type ChangeEvent,
-  type ReactNode,
-} from 'react';
-import {
-  FileIcon,
-  UploadCloudIcon,
-  SuccessIcon,
-  ErrorIcon,
-  XIcon,
-  Loader2,
-} from '@stockflow/icons';
+import { useId, type ChangeEvent, type ReactNode } from 'react';
+import { FileIcon, UploadCloudIcon, SuccessIcon, ErrorIcon, XIcon, Loader2 } from '@stockflow/icons';
 import { cn } from '../../lib/cn';
-
-export type UploadStatus = 'pending' | 'uploading' | 'success' | 'error';
-
-export interface UploadFile {
-  /** Stable id for list keys / removal. */
-  id: string;
-  /** The underlying browser File. */
-  file: File;
-  /** Upload lifecycle status (parent-driven; defaults to `'pending'`). */
-  status?: UploadStatus;
-  /** Upload progress 0–100 (shown while `status === 'uploading'`). */
-  progress?: number;
-  /** Error message (shown while `status === 'error'`). */
-  error?: string;
-}
-
-export type FileRejectionCode =
-  | 'file-too-large'
-  | 'file-too-small'
-  | 'file-invalid-type'
-  | 'too-many-files';
-
-export interface FileRejection {
-  file: File;
-  errors: { code: FileRejectionCode; message: string }[];
-}
+import {
+  formatBytes,
+  useFileUpload,
+  type FileRejection,
+  type UploadFile,
+  type UploadStatus,
+} from './use-file-upload';
 
 export interface FileUploadProps {
   /** Controlled list of selected files. */
@@ -79,33 +46,6 @@ export interface FileUploadProps {
   'aria-label'?: string;
 }
 
-const UNITS = ['B', 'KB', 'MB', 'GB', 'TB'] as const;
-
-/** Human-readable file size, e.g. `1536` → `"1.5 KB"`. */
-export function formatBytes(bytes: number): string {
-  if (!Number.isFinite(bytes) || bytes <= 0) return '0 B';
-  const k = 1024;
-  const i = Math.min(Math.floor(Math.log(bytes) / Math.log(k)), UNITS.length - 1);
-  const value = bytes / k ** i;
-  return `${i === 0 ? value : value.toFixed(1)} ${UNITS[i] ?? 'B'}`;
-}
-
-/** Does `file` satisfy the HTML `accept` string (extensions, `type/*` wildcards, exact mime)? */
-function isAccepted(file: File, accept: string): boolean {
-  const tokens = accept
-    .split(',')
-    .map((t) => t.trim().toLowerCase())
-    .filter(Boolean);
-  if (tokens.length === 0) return true;
-  const name = file.name.toLowerCase();
-  const type = file.type.toLowerCase();
-  return tokens.some((token) => {
-    if (token.startsWith('.')) return name.endsWith(token);
-    if (token.endsWith('/*')) return type.startsWith(`${token.slice(0, token.indexOf('/'))}/`);
-    return type === token;
-  });
-}
-
 const statusIcon = {
   pending: null,
   uploading: <Loader2 className="size-4 shrink-0 animate-spin text-muted-foreground" aria-hidden="true" />,
@@ -139,99 +79,24 @@ export function FileUpload({
 }: FileUploadProps) {
   const inputId = useId();
   const errorsId = useId();
-  const inputRef = useRef<HTMLInputElement | null>(null);
-  const dragDepth = useRef(0);
 
-  const isControlled = value !== undefined;
-  const [internal, setInternal] = useState<UploadFile[]>(defaultValue ?? []);
-  const files = isControlled ? value : internal;
-
-  const [dragging, setDragging] = useState(false);
-  const [rejections, setRejections] = useState<FileRejection[]>([]);
-  const idRef = useRef(0);
-  const nextId = () => `file-${idRef.current++}`;
-
-  const setFiles = (next: UploadFile[]) => {
-    if (!isControlled) setInternal(next);
-    onChange?.(next);
-  };
-
-  const validate = (file: File): FileRejection['errors'] => {
-    const errors: FileRejection['errors'] = [];
-    if (accept && !isAccepted(file, accept)) {
-      errors.push({ code: 'file-invalid-type', message: 'File type is not allowed.' });
-    }
-    if (maxSize !== undefined && file.size > maxSize) {
-      errors.push({ code: 'file-too-large', message: `File is larger than ${formatBytes(maxSize)}.` });
-    }
-    if (minSize !== undefined && file.size < minSize) {
-      errors.push({ code: 'file-too-small', message: `File is smaller than ${formatBytes(minSize)}.` });
-    }
-    return errors;
-  };
-
-  const addFiles = (incoming: FileList | File[]) => {
-    if (disabled) return;
-    const list = Array.from(incoming);
-    if (list.length === 0) return;
-
-    const accepted: UploadFile[] = [];
-    const rejected: FileRejection[] = [];
-    // Single mode replaces the current file → validate against an empty base, capacity 1.
-    const base = multiple ? files : [];
-    const cap = multiple ? maxFiles : 1;
-
-    for (const file of list) {
-      const errors = validate(file);
-      if (cap !== undefined && base.length + accepted.length >= cap) {
-        errors.push({
-          code: 'too-many-files',
-          message: cap === 1 ? 'Only one file is allowed.' : `No more than ${cap} files.`,
-        });
-      }
-      if (errors.length > 0) rejected.push({ file, errors });
-      else accepted.push({ id: nextId(), file, status: 'pending' });
-    }
-
-    if (accepted.length > 0) setFiles([...base, ...accepted]);
-    setRejections(rejected);
-    if (rejected.length > 0) onReject?.(rejected);
-  };
-
-  const remove = (id: string) => {
-    const item = files.find((f) => f.id === id);
-    setFiles(files.filter((f) => f.id !== id));
-    if (item) onRemove?.(item);
-  };
+  const { files, rejections, dragging, addFiles, remove, dragHandlers } = useFileUpload({
+    value,
+    defaultValue,
+    onChange,
+    onReject,
+    onRemove,
+    accept,
+    multiple,
+    maxFiles,
+    maxSize,
+    minSize,
+    disabled,
+  });
 
   const handleInputChange = (event: ChangeEvent<HTMLInputElement>) => {
     if (event.target.files) addFiles(event.target.files);
-    // Reset so selecting the same file again re-fires change.
-    event.target.value = '';
-  };
-
-  const handleDragEnter = (event: DragEvent<HTMLLabelElement>) => {
-    event.preventDefault();
-    if (disabled) return;
-    dragDepth.current += 1;
-    setDragging(true);
-  };
-  const handleDragOver = (event: DragEvent<HTMLLabelElement>) => {
-    event.preventDefault();
-  };
-  const handleDragLeave = (event: DragEvent<HTMLLabelElement>) => {
-    event.preventDefault();
-    dragDepth.current -= 1;
-    if (dragDepth.current <= 0) {
-      dragDepth.current = 0;
-      setDragging(false);
-    }
-  };
-  const handleDrop = (event: DragEvent<HTMLLabelElement>) => {
-    event.preventDefault();
-    dragDepth.current = 0;
-    setDragging(false);
-    if (!disabled && event.dataTransfer?.files) addFiles(event.dataTransfer.files);
+    event.target.value = ''; // reset so re-selecting the same file re-fires change
   };
 
   const hintParts: string[] = [];
@@ -246,10 +111,7 @@ export function FileUpload({
         data-dragging={dragging || undefined}
         data-disabled={disabled || undefined}
         data-invalid={invalid || undefined}
-        onDragEnter={handleDragEnter}
-        onDragOver={handleDragOver}
-        onDragLeave={handleDragLeave}
-        onDrop={handleDrop}
+        {...dragHandlers}
         className={cn(
           'flex flex-col items-center justify-center gap-2 rounded-lg border-2 border-dashed border-input bg-background p-6 text-center transition-colors',
           'cursor-pointer hover:bg-accent/40',
@@ -260,7 +122,6 @@ export function FileUpload({
         )}
       >
         <input
-          ref={inputRef}
           id={inputId}
           type="file"
           className="sr-only"

@@ -2,7 +2,8 @@ import { describe, it, expect, vi } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { axe } from 'jest-axe';
-import { FileUpload, formatBytes, type UploadFile } from './file-upload';
+import { FileUpload } from './file-upload';
+import { formatBytes, type UploadFile } from './use-file-upload';
 
 /** A File with a controllable `size` (File.size is otherwise derived from content). */
 function makeFile(name: string, type: string, size = 10): File {

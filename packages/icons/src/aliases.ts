@@ -33,6 +33,7 @@ export {
   Calendar as CalendarIcon,
   File as FileIcon,
   CloudUpload as UploadCloudIcon,
+  Image as ImageIcon,
   // Actions
   Plus as AddIcon,
   Pencil as EditIcon,

@@ -1,9 +1,12 @@
+export { FileUpload, type FileUploadProps } from './file-upload';
 export {
-  FileUpload,
+  useFileUpload,
   formatBytes,
-  type FileUploadProps,
+  isFileAccepted,
   type UploadFile,
   type UploadStatus,
   type FileRejection,
   type FileRejectionCode,
-} from './file-upload';
+  type UseFileUploadOptions,
+  type UseFileUploadReturn,
+} from './use-file-upload';
