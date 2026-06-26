@@ -30,3 +30,4 @@ export * from './toast';
 export * from './notification';
 export * from './loading';
 export * from './skeleton';
+export * from './search';
