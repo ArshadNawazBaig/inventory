@@ -16,3 +16,5 @@ export * from './dropdown';
 export * from './sidebar';
 export * from './navbar';
 export * from './pagination';
+export * from './breadcrumb';
+export * from './tabs';

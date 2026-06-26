@@ -50,6 +50,8 @@ is the first and doubles as the spec template.
 | [Sidebar](./components/sidebar.md) | ✅ Implemented (5 tests + stories) |
 | [Navbar](./components/navbar.md) | ✅ Implemented (5 tests + stories) |
 | [Pagination](./components/pagination.md) | ✅ Implemented (12 tests + stories) |
+| [Breadcrumb](./components/breadcrumb.md) | ✅ Implemented (8 tests + stories) |
+| [Tabs](./components/tabs.md) | ✅ Implemented (7 tests + stories) |
 
 **Component build order (specs in strict list order, delivered in batches):**
 
