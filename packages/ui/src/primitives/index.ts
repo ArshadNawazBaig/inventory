@@ -6,3 +6,4 @@ export * from './checkbox';
 export * from './switch';
 export * from './radio';
 export * from './avatar';
+export * from './badge';
