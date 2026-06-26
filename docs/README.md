@@ -61,6 +61,7 @@ is the first and doubles as the spec template.
 | [File Upload](./components/file-upload.md) | ✅ Implemented (native dropzone · 11 tests + stories) |
 | [Image Upload](./components/image-upload.md) | ✅ Implemented (thumbnails · shares useFileUpload · 10 tests + stories) |
 | [Toast](./components/toast.md) | ✅ Implemented (Radix + imperative store · 7 tests + stories) |
+| [Notification](./components/notification.md) | ✅ Implemented (inline alert banner · 7 tests + stories) |
 
 **Component build order (specs in strict list order, delivered in batches):**
 
