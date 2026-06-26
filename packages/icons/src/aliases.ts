@@ -25,6 +25,8 @@ export {
   Users as MembersIcon,
   Bell as NotificationIcon,
   Settings as SettingsIcon,
+  Menu as MenuIcon,
+  PanelLeft as PanelLeftIcon,
   // Actions
   Plus as AddIcon,
   Pencil as EditIcon,

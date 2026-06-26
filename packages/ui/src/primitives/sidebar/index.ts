@@ -1,0 +1,17 @@
+export {
+  SidebarProvider,
+  Sidebar,
+  SidebarHeader,
+  SidebarContent,
+  SidebarFooter,
+  SidebarGroup,
+  SidebarGroupLabel,
+  SidebarMenu,
+  SidebarMenuItem,
+  SidebarMenuButton,
+  SidebarTrigger,
+  useSidebar,
+  type SidebarProviderProps,
+  type SidebarProps,
+  type SidebarMenuButtonProps,
+} from './sidebar';
