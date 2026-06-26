@@ -1,0 +1,31 @@
+{
+  "name": "stockflow",
+  "version": "0.0.0",
+  "private": true,
+  "packageManager": "pnpm@11.0.6",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "build": "turbo run build",
+    "dev": "turbo run dev --filter=@stockflow/web --filter=@stockflow/api",
+    "dev:all": "turbo run dev",
+    "dev:web": "turbo run dev --filter=@stockflow/web",
+    "dev:api": "turbo run dev --filter=@stockflow/api",
+    "dev:worker": "turbo run dev --filter=@stockflow/worker",
+    "dev:server": "turbo run dev --filter=@stockflow/api --filter=@stockflow/worker",
+    "lint": "turbo run lint",
+    "typecheck": "turbo run typecheck",
+    "test": "turbo run test",
+    "clean": "turbo run clean",
+    "format": "prettier --write \"**/*.{ts,tsx,js,mjs,json,md,css}\"",
+    "format:check": "prettier --check \"**/*.{ts,tsx,js,mjs,json,md,css}\""
+  },
+  "devDependencies": {
+    "@stockflow/eslint-config": "workspace:*",
+    "eslint": "^9.17.0",
+    "prettier": "^3.4.2",
+    "turbo": "^2.3.3",
+    "typescript": "^5.7.2"
+  }
+}

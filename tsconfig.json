@@ -1,0 +1,9 @@
+{
+  "//": "Root tsconfig for editor tooling only. Each app/package has its own.",
+  "extends": "@stockflow/tsconfig/base.json",
+  "compilerOptions": {
+    "noEmit": true
+  },
+  "include": [],
+  "exclude": ["node_modules", "**/dist", "**/.next"]
+}

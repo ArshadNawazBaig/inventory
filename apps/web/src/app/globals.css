@@ -1,0 +1,4 @@
+@import 'tailwindcss';
+@import '@stockflow/ui/styles.css';
+
+/* App-level base styles. Design tokens live in @stockflow/ui (DESIGN_SYSTEM phase). */

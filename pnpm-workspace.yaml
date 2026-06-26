@@ -1,0 +1,9 @@
+packages:
+  - "apps/*"
+  - "packages/*"
+
+# Native build-script approvals. sharp powers Next.js image optimization;
+# @scarf is telemetry we don't need to build.
+allowBuilds:
+  sharp: true
+  "@scarf/scarf": false
