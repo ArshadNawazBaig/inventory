@@ -43,6 +43,7 @@ is the first and doubles as the spec template.
 | [Badge](./components/badge.md) | ✅ Implemented (7 tests + stories) |
 | [Card](./components/card.md) | ✅ Implemented (7 tests + stories) |
 | [Dialog](./components/dialog.md) | ✅ Implemented (6 tests + stories) |
+| [Modal](./components/modal.md) | ✅ Implemented (preset over Dialog · 5 tests + stories) |
 
 **Component build order (specs in strict list order, delivered in batches):**
 
