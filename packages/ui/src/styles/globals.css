@@ -129,6 +129,40 @@
     }
   }
 
+  /* Toast (Radix) — slide in from the edge, fade out, and follow swipe-to-dismiss */
+  --animate-toast-in: toast-in var(--duration-base) var(--ease-out);
+  --animate-toast-out: toast-out var(--duration-fast) var(--ease-in);
+  --animate-toast-swipe-out: toast-swipe-out var(--duration-fast) var(--ease-in);
+
+  @keyframes toast-in {
+    from {
+      transform: translateX(calc(100% + 1.5rem));
+      opacity: 0;
+    }
+    to {
+      transform: translateX(0);
+      opacity: 1;
+    }
+  }
+
+  @keyframes toast-out {
+    from {
+      opacity: 1;
+    }
+    to {
+      opacity: 0;
+    }
+  }
+
+  @keyframes toast-swipe-out {
+    from {
+      transform: translateX(var(--radix-toast-swipe-end-x));
+    }
+    to {
+      transform: translateX(calc(100% + 1.5rem));
+    }
+  }
+
   /* Breakpoints (explicit) */
   --breakpoint-sm: 40rem;
   --breakpoint-md: 48rem;
