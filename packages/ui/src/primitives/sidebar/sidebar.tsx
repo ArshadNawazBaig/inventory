@@ -168,9 +168,9 @@ export interface SidebarMenuButtonProps extends ButtonHTMLAttributes<HTMLButtonE
 }
 
 /**
- * A nav row. Provide an icon + label as children (e.g. `<ProductIcon /><span>Products</span>`); in the
- * icon rail the row shrinks and the label is **clipped** (kept in the accessible name, not removed).
- * Works with `asChild` (the single child element supplies everything).
+ * A nav row. Provide the icon **first**, then the label (e.g. `<ProductIcon /><span>Products</span>`);
+ * in the icon rail the row shrinks to a square and the label is hidden via `sr-only` — visually
+ * icon-only, but kept in the accessible name. Works with `asChild` (the child supplies everything).
  */
 export const SidebarMenuButton = forwardRef<HTMLButtonElement, SidebarMenuButtonProps>(
   function SidebarMenuButton({ className, asChild = false, active = false, tooltip, children, ...props }, ref) {
@@ -185,8 +185,11 @@ export const SidebarMenuButton = forwardRef<HTMLButtonElement, SidebarMenuButton
           'flex w-full items-center gap-2 overflow-hidden rounded-md px-2 py-2 text-left text-sm outline-none transition-colors',
           'hover:bg-accent hover:text-accent-foreground',
           'focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1 focus-visible:ring-offset-card',
-          'data-[active=true]:bg-accent data-[active=true]:font-medium data-[active=true]:text-accent-foreground',
-          'group-data-[state=collapsed]/sidebar:size-8 group-data-[state=collapsed]/sidebar:justify-center group-data-[state=collapsed]/sidebar:p-0',
+          'data-[active=true]:bg-primary data-[active=true]:font-medium data-[active=true]:text-primary-foreground',
+          'group-data-[state=collapsed]/sidebar:size-8 group-data-[state=collapsed]/sidebar:justify-center group-data-[state=collapsed]/sidebar:gap-0 group-data-[state=collapsed]/sidebar:p-0',
+          // Collapsed = icon only: the icon is the first child; everything after it (the label)
+          // is taken out of the flow via sr-only — invisible, no sliver, but kept in the a11y name.
+          'group-data-[state=collapsed]/sidebar:[&>:not(:first-child)]:sr-only',
           '[&>svg]:size-4 [&>svg]:shrink-0',
           className,
         )}

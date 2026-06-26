@@ -161,9 +161,9 @@ export default function SidebarShowcase() {
         <Guidelines
           items={[
             <>
-              Provide the icon + label as <strong>children</strong> (e.g.{' '}
+              Provide the icon <strong>first</strong>, then the label (e.g.{' '}
               <code className="font-mono">&lt;ProductIcon /&gt;&lt;span&gt;Products&lt;/span&gt;</code>);
-              when collapsed the label is clipped but stays in the accessible name.
+              when collapsed the label is hidden (icon-only) but stays in the accessible name.
             </>,
             <>
               Use real links with <code className="font-mono">asChild</code> and set{' '}

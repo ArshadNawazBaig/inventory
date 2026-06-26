@@ -79,7 +79,7 @@ export const NavbarLink = forwardRef<HTMLAnchorElement, NavbarLinkProps>(functio
         'inline-flex h-9 items-center gap-2 rounded-md px-3 text-sm font-medium text-muted-foreground transition-colors',
         'hover:bg-accent hover:text-accent-foreground',
         'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
-        'data-[active=true]:bg-accent data-[active=true]:text-accent-foreground',
+        'data-[active=true]:bg-primary data-[active=true]:text-primary-foreground',
         '[&>svg]:size-4 [&>svg]:shrink-0',
         className,
       )}
