@@ -20,10 +20,19 @@ implemented before its documentation has been written and approved.
 | [DESIGN_SYSTEM.md](./DESIGN_SYSTEM.md) | 🟡 Awaiting approval (tokens implemented in `packages/ui`) | 4 — Component Design |
 | [ICON_SYSTEM.md](./ICON_SYSTEM.md) | 🟡 Awaiting approval (implemented in `packages/icons`) | 4 — Component Design |
 | [ANIMATION_GUIDELINES.md](./ANIMATION_GUIDELINES.md) | 🟡 Awaiting approval (tokens in `packages/ui`) | 4 — Component Design |
-| [COMPONENT_LIBRARY.md](./COMPONENT_LIBRARY.md) | ⚪ Not started | 4 — Component Design |
+| [COMPONENT_LIBRARY.md](./COMPONENT_LIBRARY.md) | 🟡 Awaiting approval (structure scaffolded in `packages/ui`) | 4 — Component Design |
 | [CODING_STANDARDS.md](./CODING_STANDARDS.md) | 🟡 Awaiting approval | Cross-cutting |
 
 **Legend:** 🟢 Approved · 🟡 Awaiting approval · 🔵 In review · ⚪ Not started
+
+## Component specs
+
+Per-component design specs live in [`components/`](./components/). [`button.md`](./components/button.md)
+is the first and doubles as the spec template.
+
+| Component | Status |
+|-----------|--------|
+| [Button](./components/button.md) | 🟡 Awaiting approval (design only) |
 
 ## Delivery process
 
