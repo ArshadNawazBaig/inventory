@@ -19,3 +19,4 @@ export * from './pagination';
 export * from './breadcrumb';
 export * from './tabs';
 export * from './accordion';
+export * from './table';
