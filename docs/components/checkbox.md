@@ -3,7 +3,7 @@
 | Field | Value |
 |-------|-------|
 | **Component** | `Checkbox` (`@stockflow/ui` → `primitives/checkbox`) |
-| **Status** | 🟡 Designed — awaiting approval (Batch 1 · forms) |
+| **Status** | ✅ Implemented — control + 9 tests + stories in `packages/ui` (`CheckboxGroup` composite ships with `Field`) |
 | **Owner** | Frontend Lead / UI Engineer |
 | **Date** | 2026-06-26 |
 | **Depends on** | [DESIGN_SYSTEM.md](../DESIGN_SYSTEM.md) · [COMPONENT_LIBRARY.md](../COMPONENT_LIBRARY.md) · [input.md](./input.md) (Field contract) · **Radix Checkbox** |

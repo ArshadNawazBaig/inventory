@@ -36,7 +36,7 @@ is the first and doubles as the spec template.
 | [Input](./components/input.md) | ✅ Implemented (11 tests + stories) |
 | [Textarea](./components/textarea.md) | ✅ Implemented (11 tests + stories) |
 | [Select](./components/select.md) | ✅ Implemented (8 tests + stories) |
-| [Checkbox](./components/checkbox.md) | 🟡 Spec — awaiting approval (Batch 1 · forms) |
+| [Checkbox](./components/checkbox.md) | ✅ Implemented (9 tests + stories) |
 | [Switch](./components/switch.md) | 🟡 Spec — awaiting approval (Batch 1 · forms) |
 | [Radio](./components/radio.md) | 🟡 Spec — awaiting approval (Batch 1 · forms) |
 
