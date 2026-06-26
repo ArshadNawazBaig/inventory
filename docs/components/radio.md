@@ -3,7 +3,7 @@
 | Field | Value |
 |-------|-------|
 | **Component** | `RadioGroup` + `RadioGroupItem` (`@stockflow/ui` → `primitives/radio`) |
-| **Status** | 🟡 Designed — awaiting approval (Batch 1 · forms) |
+| **Status** | ✅ Implemented — `RadioGroup`+`RadioGroupItem` + 7 tests + stories in `packages/ui` |
 | **Owner** | Frontend Lead / UI Engineer |
 | **Date** | 2026-06-26 |
 | **Depends on** | [DESIGN_SYSTEM.md](../DESIGN_SYSTEM.md) · [COMPONENT_LIBRARY.md](../COMPONENT_LIBRARY.md) · [checkbox.md](./checkbox.md) (sibling) · **Radix RadioGroup** |

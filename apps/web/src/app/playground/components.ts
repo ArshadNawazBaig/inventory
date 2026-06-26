@@ -27,7 +27,7 @@ export const PLAYGROUND_GROUPS: PlaygroundGroup[] = [
       { slug: 'select', name: 'Select', ready: true },
       { slug: 'checkbox', name: 'Checkbox', ready: true },
       { slug: 'switch', name: 'Switch', ready: true },
-      { slug: 'radio', name: 'Radio', ready: false },
+      { slug: 'radio', name: 'Radio', ready: true },
     ],
   },
   {
