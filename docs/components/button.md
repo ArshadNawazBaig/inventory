@@ -3,7 +3,7 @@
 | Field | Value |
 |-------|-------|
 | **Component** | `Button` (`@stockflow/ui` → `primitives/button`) |
-| **Status** | 🟡 Awaiting approval — **design only, not implemented** |
+| **Status** | ✅ Implemented — component + variants + tests (12) + stories in `packages/ui` |
 | **Owner** | Frontend Lead / UI Engineer |
 | **Date** | 2026-06-26 |
 | **Depends on** | [DESIGN_SYSTEM.md](../DESIGN_SYSTEM.md) · [ICON_SYSTEM.md](../ICON_SYSTEM.md) · [ANIMATION_GUIDELINES.md](../ANIMATION_GUIDELINES.md) · [COMPONENT_LIBRARY.md](../COMPONENT_LIBRARY.md) |

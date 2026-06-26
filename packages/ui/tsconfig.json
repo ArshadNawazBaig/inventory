@@ -1,9 +1,9 @@
 {
+  "//": "Typecheck config — covers source + tests (excludes stories; Storybook installed later).",
   "extends": "@stockflow/tsconfig/react-library.json",
   "compilerOptions": {
-    "outDir": "dist",
-    "rootDir": "src"
+    "noEmit": true
   },
-  "include": ["src"],
-  "exclude": ["src/styles"]
+  "include": ["src", "vitest.config.ts", "vitest.setup.ts"],
+  "exclude": ["node_modules", "dist", "src/**/*.stories.tsx"]
 }

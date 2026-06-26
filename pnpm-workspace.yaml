@@ -7,3 +7,4 @@ packages:
 allowBuilds:
   sharp: true
   "@scarf/scarf": false
+  esbuild: true

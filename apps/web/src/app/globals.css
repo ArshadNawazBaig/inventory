@@ -1,4 +1,7 @@
 @import 'tailwindcss';
 @import '@stockflow/ui/styles.css';
 
+/* Let Tailwind scan the design-system package for class names used by its components. */
+@source '../../../../packages/ui/src';
+
 /* App-level base styles. Design tokens live in @stockflow/ui (DESIGN_SYSTEM phase). */
