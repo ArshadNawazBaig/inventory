@@ -3,7 +3,7 @@
 | Field | Value |
 |-------|-------|
 | **Component** | `Select` (`@stockflow/ui` → `primitives/select`) |
-| **Status** | 🟡 Designed — awaiting approval (Batch 1 · forms) |
+| **Status** | ✅ Implemented — composable parts + 8 tests + stories in `packages/ui` |
 | **Owner** | Frontend Lead / UI Engineer |
 | **Date** | 2026-06-26 |
 | **Depends on** | [DESIGN_SYSTEM.md](../DESIGN_SYSTEM.md) · [COMPONENT_LIBRARY.md](../COMPONENT_LIBRARY.md) · [input.md](./input.md) (trigger matches Input) · **Radix Select** |
