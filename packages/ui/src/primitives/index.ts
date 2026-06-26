@@ -21,3 +21,4 @@ export * from './tabs';
 export * from './accordion';
 export * from './table';
 export * from './data-grid';
+export * from './chart';
