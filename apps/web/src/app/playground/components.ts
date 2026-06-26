@@ -35,7 +35,7 @@ export const PLAYGROUND_GROUPS: PlaygroundGroup[] = [
     items: [
       { slug: 'avatar', name: 'Avatar', ready: true },
       { slug: 'badge', name: 'Badge', ready: true },
-      { slug: 'card', name: 'Card', ready: false },
+      { slug: 'card', name: 'Card', ready: true },
     ],
   },
   {

@@ -7,3 +7,4 @@ export * from './switch';
 export * from './radio';
 export * from './avatar';
 export * from './badge';
+export * from './card';
