@@ -89,7 +89,7 @@ export const PLAYGROUND_GROUPS: PlaygroundGroup[] = [
     title: 'Search & command',
     items: [
       { slug: 'search', name: 'Search', ready: true },
-      { slug: 'filters', name: 'Filters', ready: false },
+      { slug: 'filters', name: 'Filters', ready: true },
       { slug: 'command-palette', name: 'Command Palette', ready: false },
     ],
   },
