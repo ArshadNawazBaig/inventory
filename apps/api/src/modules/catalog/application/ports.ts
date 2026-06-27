@@ -40,6 +40,8 @@ export interface VariantRepository {
     patch: Partial<VariantEntity>,
   ): Promise<VariantEntity | null>;
   countLiveByProduct(organizationId: string, productId: string): Promise<number>;
+  /** Count of all live variants for the tenant — the basis for billing usage/entitlements. */
+  countAll(organizationId: string): Promise<number>;
 }
 
 /** Read-only window into the Inventory module (delete/archive guards). */

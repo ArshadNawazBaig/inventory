@@ -53,6 +53,11 @@ export class CatalogQuery {
     };
   }
 
+  /** Count of all live variants for the tenant — consumed by the Billing usage report. */
+  async countVariants(organizationId: string): Promise<number> {
+    return this.variants.countAll(organizationId);
+  }
+
   /** Live variants with a positive reorder point, joined with their product name (low-stock report source). */
   async listReorderVariants(organizationId: string): Promise<ReorderVariant[]> {
     const variants = await this.variants.listAll(organizationId);

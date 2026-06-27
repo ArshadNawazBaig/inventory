@@ -12,6 +12,7 @@ import {
 import { ConfigModule } from './config';
 import { HealthController } from './health/health.controller';
 import { AuditModule } from './modules/audit/audit.module';
+import { BillingModule } from './modules/billing/billing.module';
 import { DashboardModule } from './modules/dashboard/dashboard.module';
 import { NotificationsModule } from './modules/notifications/notifications.module';
 import { CatalogLookupsModule } from './modules/catalog-lookups/catalog-lookups.module';
@@ -48,6 +49,7 @@ import { TransfersModule } from './modules/transfers/transfers.module';
     NotificationsModule,
     ReportsModule,
     DashboardModule,
+    BillingModule,
   ],
   controllers: [HealthController],
   providers: [

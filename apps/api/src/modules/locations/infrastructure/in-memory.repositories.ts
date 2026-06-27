@@ -110,6 +110,14 @@ export class InMemoryLocationRepository implements LocationRepository {
     return Promise.resolve({ items: page, total });
   }
 
+  countAll(organizationId: string): Promise<number> {
+    let count = 0;
+    for (const location of this.store.values()) {
+      if (location.organizationId === organizationId && location.deletedAt === null) count += 1;
+    }
+    return Promise.resolve(count);
+  }
+
   private comparator(sort: LocationListQuery['sort']): (a: LocationEntity, b: LocationEntity) => number {
     const descending = sort.startsWith('-');
     const field = (descending ? sort.slice(1) : sort) as 'path' | 'code' | 'name' | 'createdAt' | 'updatedAt';

@@ -30,6 +30,8 @@ export interface LocationRepository {
   findLiveChildren(organizationId: string, parentLocationId: string): Promise<LocationEntity[]>;
   update(organizationId: string, id: string, patch: Partial<LocationEntity>): Promise<LocationEntity | null>;
   list(organizationId: string, query: LocationListQuery): Promise<{ items: LocationEntity[]; total: number }>;
+  /** Count of live locations for the tenant — the basis for billing usage/entitlements. */
+  countAll(organizationId: string): Promise<number>;
 }
 
 // ─── DI tokens (framework-agnostic symbols; wired in locations.module.ts) ────────

@@ -47,6 +47,7 @@ Per-module design specs (entities · DTOs · validation · API · permissions ·
 | [Reports](./modules/reports.md) | Analytics | 🟢 Backend implemented (read-only cross-module aggregations · inventory valuation @ weighted-avg cost w/ by-warehouse breakdown · catalog-driven low-stock incl. out-of-stock · 11 tests) · 🟢 Frontend implemented (valuation KPIs + Recharts bar chart + tables · low-stock reorder table · tabs · 2 tests) |
 | [Dashboard](./modules/dashboard.md) | Analytics | 🟢 Backend implemented (read-only overview composing Reports valuation + low-stock, order status counts, enriched ledger feed · `*Query.countByStatus` seams · 14 tests) · 🟢 Frontend implemented (KPI tiles · value-by-warehouse chart · reorder list · recent-activity feed · 3 tests) |
 | [Settings](./modules/settings.md) | Platform | 🟢 Backend implemented (organization singleton · preferences + `allowNegativeStock` policy now backing the Inventory ledger via `SettingsQuery` · 13 tests) · 🟢 Frontend implemented (RHF + Zod form · currency/timezone selects · policy toggles · 4 tests) |
+| [Billing](./modules/billing.md) | Platform | 🟢 Backend implemented (subscription singleton · fixed plan catalog · usage vs limits · Stripe behind `BillingProviderPort` (fake provider) · `BillingQuery` entitlements · 11 tests) · 🟢 Frontend implemented (current-plan summary · usage bars · plan-catalog grid · 4 tests) |
 
 ## Component specs
 

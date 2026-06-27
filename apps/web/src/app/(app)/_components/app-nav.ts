@@ -1,6 +1,7 @@
 import type { LucideIcon } from '@stockflow/icons';
 import {
   AuditIcon,
+  BillingIcon,
   BrandIcon,
   CategoryIcon,
   DashboardIcon,
@@ -78,6 +79,7 @@ export const APP_NAV: NavGroup[] = [
     title: 'Settings',
     items: [
       { label: 'Audit log', href: '/audit-logs', icon: AuditIcon },
+      { label: 'Billing', href: '/billing', icon: BillingIcon },
       { label: 'Settings', href: '/settings', icon: SettingsIcon },
     ],
   },

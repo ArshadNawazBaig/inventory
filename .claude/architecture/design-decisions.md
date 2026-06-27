@@ -351,6 +351,25 @@ dependency — is recorded here with context, decision, and consequences.
   policy); low-stock alert delivery via the notification fan-out. Permission keys `settings.{view,manage}` to
   sync into AUTHENTICATION §10.
 
+### ADR-029 — Billing: subscription + plan catalog, Stripe behind a provider port
+- Status: Accepted · Context: Wave 8 (final module). The stack names Stripe, but keys/webhooks aren't wired —
+  the same situation as Mongoose/Better Auth, handled the same way.
+- Decision: a **Billing module** owning a per-tenant **subscription singleton** against a fixed **plan catalog**
+  (`BILLING_PLANS` in `@stockflow/types`: free/starter/growth/enterprise, each with price, interval, limits,
+  features). Payment is abstracted behind a **`BillingProviderPort`** with a **`FakeBillingProvider`** that
+  activates synchronously and computes the period from the plan interval; the real `StripeBillingProvider`
+  (checkout + customer portal + webhooks) drops into the same seam. `GET` of the subscription returns the
+  **free-plan default without persisting**; change/cancel go through the provider and persist what it returns.
+  `GET /billing/usage` reports live counts (variants, locations) against the plan limits — this added
+  `CatalogQuery.countVariants` + `LocationQuery.countLocations` (repo `countAll`). `BillingQuery.getEntitlements`
+  is exported as the entitlements seam. Depends one-way on Catalog + Locations (bound by identity); no cycles.
+- Consequences: a fully runnable + testable billing flow now (verified by smoke), with the Stripe integration
+  isolated to one adapter. Rejected: coupling the app to the Stripe SDK before keys exist; a per-tenant plans
+  table (plans are product config); enforcing quotas this wave (the read seam is ready; enforcement is its own
+  iteration). Follow-ups: the Stripe provider; quota enforcement via `getEntitlements`; seat-based plans once a
+  members module lands; invoices/payment methods. Permission keys `billing.{view,manage}` to sync into
+  AUTHENTICATION §10. Relates to the open "monetization shape" decision (hybrid seats + usage caps).
+
 ## Open decisions (need ratification)
 - Package manager/task runner (pnpm + Turborepo proposed).
 - Inventory valuation method default (weighted-average proposed).

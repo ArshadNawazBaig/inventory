@@ -91,3 +91,6 @@ export * from './dashboard';
 
 // Settings (organization singleton — preferences + stock policy) contracts.
 export * from './settings';
+
+// Billing (subscription · plan catalog · usage) contracts.
+export * from './billing';

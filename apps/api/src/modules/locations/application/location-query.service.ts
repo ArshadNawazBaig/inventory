@@ -43,4 +43,9 @@ export class LocationQuery {
     const warehouse = await this.warehouses.findById(organizationId, warehouseId);
     return warehouse?.name ?? null;
   }
+
+  /** Count of live locations for the tenant — consumed by the Billing usage report. */
+  async countLocations(organizationId: string): Promise<number> {
+    return this.locations.countAll(organizationId);
+  }
 }
