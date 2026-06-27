@@ -1,4 +1,5 @@
 import { Module } from '@nestjs/common';
+import { ObjectIdGenerator } from '../../common/resource';
 import {
   CATALOG_REFERENCE,
   type CatalogReferencePort,
@@ -17,13 +18,13 @@ import {
 } from './application/ports';
 import { CatalogLookupsModule } from '../catalog-lookups/catalog-lookups.module';
 import { CatalogLookupQuery } from '../catalog-lookups/application/catalog-lookup-query.service';
+import { CatalogQuery } from './application/catalog-query.service';
 import { ProductService } from './application/product.service';
 import {
   LoggingEventPublisher,
   LookupCatalogReference,
   StubInventoryQuery,
   SystemClock,
-  UuidIdGenerator,
 } from './infrastructure/adapters';
 import {
   InMemoryProductRepository,
@@ -50,7 +51,7 @@ import { ProductController } from './presentation/product.controller';
         new LookupCatalogReference(lookups),
     },
     { provide: EVENT_PUBLISHER, useClass: LoggingEventPublisher },
-    { provide: ID_GENERATOR, useClass: UuidIdGenerator },
+    { provide: ID_GENERATOR, useValue: new ObjectIdGenerator() },
     { provide: CLOCK, useClass: SystemClock },
     {
       provide: ProductService,
@@ -74,6 +75,8 @@ import { ProductController } from './presentation/product.controller';
       ): ProductService =>
         new ProductService(products, variants, inventory, references, events, ids, clock),
     },
+    CatalogQuery,
   ],
+  exports: [CatalogQuery],
 })
 export class CatalogModule {}

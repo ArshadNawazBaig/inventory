@@ -1,0 +1,32 @@
+import { Inject, Injectable } from '@nestjs/common';
+import type { VariantStockSummary } from '../domain/entities';
+import { STOCK_LEVEL_REPOSITORY, type StockLevelRepository } from './ports';
+
+/**
+ * The public, read-only window into inventory other modules consume — the read-model that satisfies the
+ * Catalog variant-delete guard's `getVariantStockSummary` shape. Aggregates the (variant × location)
+ * projections for a variant. `hasOpenOrders` is wired when Purchasing/Sales land (false for now).
+ *
+ * Note: this is **not** synchronously wired into the Catalog module — doing so would create a Catalog ↔
+ * Inventory module cycle (dependency-rules: no circular deps). The proper integration is event/read-model
+ * driven and is a recorded follow-up (ADR-019).
+ */
+@Injectable()
+export class InventoryQuery {
+  constructor(
+    @Inject(STOCK_LEVEL_REPOSITORY) private readonly levels: StockLevelRepository,
+  ) {}
+
+  async getVariantStockSummary(organizationId: string, variantId: string): Promise<VariantStockSummary> {
+    const cells = await this.levels.listByVariant(organizationId, variantId);
+    return cells.reduce<VariantStockSummary>(
+      (summary, cell) => ({
+        onHand: summary.onHand + cell.onHand,
+        reserved: summary.reserved + cell.reserved,
+        inTransit: summary.inTransit + cell.inTransit,
+        hasOpenOrders: summary.hasOpenOrders,
+      }),
+      { onHand: 0, reserved: 0, inTransit: 0, hasOpenOrders: false },
+    );
+  }
+}

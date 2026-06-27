@@ -37,6 +37,7 @@ Per-module design specs (entities · DTOs · validation · API · permissions ·
 | [Catalog Lookups](./modules/catalog-lookups.md) | Catalog | 🟢 Backend implemented (Categories · Brands · Units · shared base · 17 tests) · 🟢 Frontend implemented (generic ResourceManager + pickers · 11 tests) — replaces Product's `StubCatalogReference` |
 | [Parties](./modules/parties.md) | Procurement & Sales | 🟢 Backend implemented (Suppliers · Customers · on `common/resource` base · 17 tests) · 🟢 Frontend implemented (shared `features/resources` toolkit · 10 tests) |
 | [Locations](./modules/locations.md) | Inventory | 🟢 Backend implemented (Warehouses on `common/resource` base · Locations bespoke per-warehouse tree · 23 tests · exports `LocationQuery`) · 🟢 Frontend implemented (warehouse admin on shared toolkit + bespoke location tree admin · 10 tests) |
+| [Inventory](./modules/inventory.md) | Inventory | 🟢 Backend implemented (immutable ledger + on-hand projection · adjustments · idempotency · weighted-avg valuation · negative-stock policy · 16 tests · exports `InventoryQuery`) · 🟢 Frontend implemented (levels + movements tabs · adjust dialog with variant/location pickers · 6 tests) |
 
 ## Component specs
 

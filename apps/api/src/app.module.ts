@@ -11,6 +11,7 @@ import { ConfigModule } from './config';
 import { HealthController } from './health/health.controller';
 import { CatalogLookupsModule } from './modules/catalog-lookups/catalog-lookups.module';
 import { CatalogModule } from './modules/catalog/catalog.module';
+import { InventoryModule } from './modules/inventory/inventory.module';
 import { LocationsModule } from './modules/locations/locations.module';
 import { PartiesModule } from './modules/parties/parties.module';
 
@@ -20,7 +21,14 @@ import { PartiesModule } from './modules/parties/parties.module';
  * and the business modules.
  */
 @Module({
-  imports: [ConfigModule, CatalogLookupsModule, CatalogModule, LocationsModule, PartiesModule],
+  imports: [
+    ConfigModule,
+    CatalogLookupsModule,
+    CatalogModule,
+    LocationsModule,
+    InventoryModule,
+    PartiesModule,
+  ],
   controllers: [HealthController],
   providers: [
     { provide: APP_FILTER, useClass: AllExceptionsFilter },

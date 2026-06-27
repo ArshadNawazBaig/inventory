@@ -1,4 +1,3 @@
-import { randomUUID } from 'node:crypto';
 import { Injectable } from '@nestjs/common';
 import { rootLogger } from '../../../common/logging/logger';
 import { CatalogLookupQuery } from '../../catalog-lookups/application/catalog-lookup-query.service';
@@ -6,18 +5,9 @@ import type {
   CatalogReferencePort,
   Clock,
   EventPublisher,
-  IdGenerator,
   InventoryQueryPort,
 } from '../application/ports';
 import type { CatalogEvent, VariantStockSummary } from '../domain/entities';
-
-/** UUID id generator (Mongo ObjectId generator replaces this with the DB module). */
-@Injectable()
-export class UuidIdGenerator implements IdGenerator {
-  generate(): string {
-    return randomUUID();
-  }
-}
 
 @Injectable()
 export class SystemClock implements Clock {

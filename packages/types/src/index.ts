@@ -61,3 +61,6 @@ export * from './parties';
 
 // Locations (Warehouses · Locations) contracts.
 export * from './locations';
+
+// Inventory (stock ledger · levels · adjustments) contracts.
+export * from './inventory';

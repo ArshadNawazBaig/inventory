@@ -168,6 +168,30 @@ dependency — is recorded here with context, decision, and consequences.
   into AUTHENTICATION §10. Deferred: stock-in-location delete guard (needs Inventory), default
   auto-promotion on delete, Mongoose adapters + materialized-path indexes, location-tree bulk import.
 
+### ADR-019 — Inventory (the keystone): immutable ledger + projection, one-way deps
+- Status: Accepted · Context: Wave 4. Stock accuracy is the product (ADR-002). Stock is tracked per
+  (variant × location); reads must be O(1) but provably correct.
+- Decision: an `inventory` module that **owns all ledger writes**. `stock_movements` is append-only (never
+  updated/deleted); `stock_levels` is a persisted projection (`onHand ≡ Σ delta`, `available = onHand −
+  reserved`) recomputed in the **same unit of work** as each ledger write (the transaction boundary;
+  Mongoose wraps it in a session later). The manual write is an **adjustment** (`type=adjustment`,
+  `reason.kind=manual`); receipts/shipments/transfers/counts/returns post through the same service in later
+  waves. Enforces: non-zero delta, live variant+location refs, negative-stock policy (stub disallows;
+  Settings wires it), idempotency via `opKey`, and weighted-average valuation on costed inbound deltas.
+  Exports `InventoryQuery` (the `getVariantStockSummary` read-model). Added `CatalogQuery.variantExists` to
+  the catalog module (exported) for reference validation. **Also aligned the Catalog module's id generator
+  to the shared `ObjectIdGenerator` (24-hex)** — it was the last holdout still minting UUIDs, which failed
+  Inventory's `variantId` 24-hex contract (the same lesson as ADR-015; caught in the live smoke).
+- Consequences: the keystone invariant lives in one place and is reconcilable (`onHand == Σ delta` from the
+  ledger). **Dependency direction is one-way: Inventory → Catalog and Inventory → Locations** (no cycle).
+  Product's variant-delete guard is **deliberately left on `StubInventoryQuery`** this wave: wiring the real
+  read-model back into Catalog would create a Catalog ↔ Inventory circular module dependency, which
+  dependency-rules forbids (enforced in CI; `forwardRef` would still cycle). The correct integration is a
+  domain event / shared read model — a recorded follow-up. Two permission keys
+  (`inventory.{view,adjust}`) to sync into AUTHENTICATION §10. Deferred: reservations create/release +
+  shipments (Sales), PO-costed receipts (Purchasing), transfer `inTransit` legs, count approval, tenant
+  `allowNegativeStock` (Settings), Mongoose adapters + reconciliation job, zero/three-decimal currencies.
+
 ## Open decisions (need ratification)
 - Package manager/task runner (pnpm + Turborepo proposed).
 - Inventory valuation method default (weighted-average proposed).
