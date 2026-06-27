@@ -225,6 +225,41 @@ dependency — is recorded here with context, decision, and consequences.
   on ship/cancel/expire), wire `reserved`/`available` upkeep into `InventoryService`, and surface ATP — needs
   an allocation decision (which location/bin), so it is its own iteration.
 
+### ADR-022 — Transfers: two-leg inter-location moves through Inventory
+- Status: Accepted · Context: Wave 6. Multi-warehouse tenants move stock between locations; this must go
+  through the one ledger writer and preserve valuation. The contracts already reserved `transfer_out`/
+  `transfer_in` movement types + a `transfer` reason kind (ADR-019 / DATABASE §6, §9).
+- Decision: a **transfer is a two-leg document** — `draft → in_transit → partially_received → completed`
+  (`cancel` from draft only). **Dispatch** posts a `transfer_out` per line from the source (negative-guarded)
+  and **captures the source's running average onto the line**; **receive** posts a `transfer_in` per line into
+  the (fixed) destination **at that captured cost**, so value moves with the goods. Both legs route through new
+  `InventoryService.transferOut/transferIn` methods (Inventory stays the single writer) and are **idempotent**
+  on `opKey = transfer:{id}:{lineId}:{out|in:newQty}`. Locations' `LocationQuery` gained `getLocationLabel`
+  for source/destination snapshots.
+- Consequences: dependency direction is one-way (Transfers → {Catalog, Locations, Inventory}); no cycles. The
+  `onHand == Σ delta` invariant holds; once dispatched, stock can only be reconciled by receiving (no cancel).
+  **In-transit stock is not on-hand at either location** this wave — the per-transfer `dispatchedQty −
+  receivedQty` is the authoritative figure; a `stock_levels.inTransit` projection is a documented follow-up.
+  Receive is per-line and partial; can't exceed the in-transit quantity (409). Frontend reuses Inventory's
+  cascading `LocationPicker` (extended with an optional `label`) + the shared `OrderStatusBadge`. Permission
+  keys `transfer.{view,manage}` to sync into AUTHENTICATION §10. Same transaction note as ADR-020 (Mongoose
+  session later).
+
+### ADR-023 — Returns: one `kind`-discriminated module, atomic completion
+- Status: Accepted · Context: Wave 6. Goods flow back both ways — customers return to us, we return to
+  suppliers. The contracts reserved `return_in`/`return_out` movement types; a `return` reason kind was added.
+- Decision: **one Returns module** discriminated by `kind` (`customer` | `supplier`) rather than two
+  near-identical modules — a customer return posts `return_in` (inbound), a supplier return posts `return_out`
+  (outbound, negative-guarded), both via new `InventoryService.returnInbound/returnOutbound`. Lifecycle is
+  minimal — `draft → completed` (`cancel` from draft) — and **completion is atomic** (all lines post at once);
+  idempotent on `opKey = return:{id}:{lineId}`. The party is validated against its kind via the existing
+  `PartyQuery` (supplier+customer exists/name), bound directly as the module's `PartyRef`.
+- Consequences: one-way deps (Returns → {Catalog, Parties, Locations, Inventory}); no cycles. Customer returns
+  re-enter stock uncosted (current average preserved); supplier returns are negative-guarded (409 on
+  insufficient stock). **No partial completion** and **no order linkage / quantity-against-original validation**
+  this wave — both are documented follow-ups (return at original cost; cap returned qty by shipped/received).
+  Permission keys `return.{view,manage}` to sync into AUTHENTICATION §10.
+
 ## Open decisions (need ratification)
 - Package manager/task runner (pnpm + Turborepo proposed).
 - Inventory valuation method default (weighted-average proposed).

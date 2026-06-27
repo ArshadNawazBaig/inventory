@@ -64,6 +64,40 @@ export interface ShipCommand {
   opKey?: string | undefined;
 }
 
+/** The outbound leg of a transfer (stock leaves the source location). */
+export interface TransferOutCommand {
+  variantId: string;
+  locationId: string;
+  quantity: number;
+  refId: string;
+  lineId: string;
+  opKey?: string | undefined;
+}
+
+/** The inbound leg of a transfer (stock lands at the destination, carrying the source's valuation). */
+export interface TransferInCommand {
+  variantId: string;
+  locationId: string;
+  quantity: number;
+  unitCostMinor?: number | null;
+  currency?: string | null;
+  refId: string;
+  lineId: string;
+  opKey?: string | undefined;
+}
+
+/** A return movement (customer return inbound, or supplier return outbound). `quantity` is always positive. */
+export interface ReturnCommand {
+  variantId: string;
+  locationId: string;
+  quantity: number;
+  unitCostMinor?: number | null;
+  currency?: string | null;
+  refId: string;
+  lineId: string;
+  opKey?: string | undefined;
+}
+
 /**
  * The inventory write + read use cases. **Only this module writes the ledger.** A manual adjustment appends
  * one immutable `stock_movements` entry and recomputes the `stock_levels` projection in a single unit of
@@ -119,6 +153,70 @@ export class InventoryService {
       delta: -cmd.quantity,
       type: 'shipment',
       reason: { kind: 'sales_order', refId: cmd.refId, lineId: cmd.lineId },
+      unitCostMinor: null,
+      currency: null,
+      note: null,
+      opKey: cmd.opKey,
+    });
+  }
+
+  /**
+   * Post the outbound leg of a transfer (`type=transfer_out`) — negative-guarded by the tenant policy. Removing
+   * units at the running average leaves the source's `avgCostMinor` unchanged, so the returned level carries the
+   * valuation the inbound leg should land at (the caller snapshots it onto the transfer line at dispatch).
+   */
+  async transferOut(ctx: ActorContext, cmd: TransferOutCommand): Promise<AdjustmentResult> {
+    return this.postMovement(ctx, {
+      variantId: cmd.variantId,
+      locationId: cmd.locationId,
+      delta: -cmd.quantity,
+      type: 'transfer_out',
+      reason: { kind: 'transfer', refId: cmd.refId, lineId: cmd.lineId },
+      unitCostMinor: null,
+      currency: null,
+      note: null,
+      opKey: cmd.opKey,
+    });
+  }
+
+  /** Post the inbound leg of a transfer (`type=transfer_in`) — costed at the source's captured average so value moves with the goods. */
+  async transferIn(ctx: ActorContext, cmd: TransferInCommand): Promise<AdjustmentResult> {
+    return this.postMovement(ctx, {
+      variantId: cmd.variantId,
+      locationId: cmd.locationId,
+      delta: cmd.quantity,
+      type: 'transfer_in',
+      reason: { kind: 'transfer', refId: cmd.refId, lineId: cmd.lineId },
+      unitCostMinor: cmd.unitCostMinor ?? null,
+      currency: cmd.currency ?? null,
+      note: null,
+      opKey: cmd.opKey,
+    });
+  }
+
+  /** Post a customer return (`type=return_in`, inbound) — stock re-enters at the given location (optionally costed). */
+  async returnInbound(ctx: ActorContext, cmd: ReturnCommand): Promise<AdjustmentResult> {
+    return this.postMovement(ctx, {
+      variantId: cmd.variantId,
+      locationId: cmd.locationId,
+      delta: cmd.quantity,
+      type: 'return_in',
+      reason: { kind: 'return', refId: cmd.refId, lineId: cmd.lineId },
+      unitCostMinor: cmd.unitCostMinor ?? null,
+      currency: cmd.currency ?? null,
+      note: null,
+      opKey: cmd.opKey,
+    });
+  }
+
+  /** Post a supplier return (`type=return_out`, outbound) — stock leaves the given location, negative-guarded. */
+  async returnOutbound(ctx: ActorContext, cmd: ReturnCommand): Promise<AdjustmentResult> {
+    return this.postMovement(ctx, {
+      variantId: cmd.variantId,
+      locationId: cmd.locationId,
+      delta: -cmd.quantity,
+      type: 'return_out',
+      reason: { kind: 'return', refId: cmd.refId, lineId: cmd.lineId },
       unitCostMinor: null,
       currency: null,
       note: null,

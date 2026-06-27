@@ -31,4 +31,10 @@ export class LocationQuery {
     const location = await this.locations.findById(organizationId, locationId);
     return location?.warehouseId ?? null;
   }
+
+  /** A human-readable label for a location, snapshotted onto documents that reference it (e.g. transfers). */
+  async getLocationLabel(organizationId: string, locationId: string): Promise<string | null> {
+    const location = await this.locations.findById(organizationId, locationId);
+    return location?.name ?? null;
+  }
 }

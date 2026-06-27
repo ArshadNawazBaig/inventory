@@ -29,7 +29,14 @@ export const STOCK_MOVEMENT_TYPES = [
 export type StockMovementType = (typeof STOCK_MOVEMENT_TYPES)[number];
 
 /** Source of a movement — links the ledger entry back to the document that caused it. */
-export const MOVEMENT_REASON_KINDS = ['purchase_order', 'sales_order', 'transfer', 'count', 'manual'] as const;
+export const MOVEMENT_REASON_KINDS = [
+  'purchase_order',
+  'sales_order',
+  'transfer',
+  'return',
+  'count',
+  'manual',
+] as const;
 export type MovementReasonKind = (typeof MOVEMENT_REASON_KINDS)[number];
 
 // ─── Reusable field schemas ──────────────────────────────────────────────────

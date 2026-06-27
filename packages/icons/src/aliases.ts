@@ -14,6 +14,7 @@ export {
   Warehouse as WarehouseIcon,
   MapPin as LocationIcon,
   ArrowLeftRight as TransferIcon,
+  Undo2 as ReturnIcon,
   SlidersHorizontal as AdjustmentIcon,
   ClipboardList as CountIcon,
   RotateCw as ReorderIcon,

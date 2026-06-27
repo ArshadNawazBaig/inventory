@@ -70,3 +70,9 @@ export * from './purchasing';
 
 // Sales (Sales Orders) contracts.
 export * from './sales';
+
+// Transfers (inter-location stock moves) contracts.
+export * from './transfers';
+
+// Returns (customer + supplier returns) contracts.
+export * from './returns';

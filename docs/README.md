@@ -40,6 +40,8 @@ Per-module design specs (entities · DTOs · validation · API · permissions ·
 | [Inventory](./modules/inventory.md) | Inventory | 🟢 Backend implemented (immutable ledger + on-hand projection · adjustments · idempotency · weighted-avg valuation · negative-stock policy · 16 tests · exports `InventoryQuery` + `InventoryService.receive/ship`) · 🟢 Frontend implemented (levels + movements tabs · adjust dialog with variant/location pickers · 6 tests) |
 | [Purchasing](./modules/purchasing.md) | Procurement | 🟢 Backend implemented (PO lifecycle · receiving posts `receipt` movements w/ weighted-avg cost · per-tenant PO sequence · 16 tests) · 🟢 Frontend implemented (list · create w/ line items · detail + receive dialog · 2 tests) |
 | [Sales](./modules/sales.md) | Sales | 🟢 Backend implemented (SO lifecycle · fulfilling posts negative-guarded `shipment` movements · per-tenant SO sequence · 11 tests) · 🟢 Frontend implemented (shared `OrderForm` · list · detail + fulfil dialog · 2 tests) |
+| [Transfers](./modules/transfers.md) | Inventory | 🟢 Backend implemented (two-leg moves · dispatch posts `transfer_out` capturing source cost · receive posts `transfer_in` at that cost · per-tenant TR sequence · 16 tests) · 🟢 Frontend implemented (list · create w/ source/dest pickers · detail + dispatch/receive dialogs · 2 tests) |
+| [Returns](./modules/returns.md) | Procurement & Sales | 🟢 Backend implemented (`kind`-discriminated · complete posts `return_in` (customer) / `return_out` (supplier, negative-guarded) · per-tenant RET sequence · 13 tests) · 🟢 Frontend implemented (list · create w/ kind-driven party · detail + complete · 2 tests) |
 
 ## Component specs
 
