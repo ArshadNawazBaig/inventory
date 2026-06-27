@@ -14,7 +14,7 @@ implemented before its documentation has been written and approved.
 | [REPOSITORY_STRUCTURE.md](./REPOSITORY_STRUCTURE.md) | 🟡 Awaiting approval | 3 — Architecture |
 | [PROJECT_SETUP.md](./PROJECT_SETUP.md) | ✅ Executed (P0 bootstrapped) | P0 — Foundations |
 | [ARCHITECTURE.md](./ARCHITECTURE.md) | 🔵 In review — authored, awaiting approval | 3 — Architecture |
-| [DATABASE.md](./DATABASE.md) | ⚪ Not started | 5 — Database |
+| [DATABASE.md](./DATABASE.md) | 🔵 In review — authored, awaiting approval | 5 — Database |
 | [API_SPEC.md](./API_SPEC.md) | ⚪ Not started | 6 — API |
 | [SECURITY.md](./SECURITY.md) | ⚪ Not started | Cross-cutting |
 | [DESIGN_SYSTEM.md](./DESIGN_SYSTEM.md) | 🟡 Awaiting approval (tokens implemented in `packages/ui`) | 4 — Component Design |
