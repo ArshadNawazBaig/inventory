@@ -3,7 +3,7 @@
 | Field | Value |
 |-------|-------|
 | **Document** | Product Module Design (Catalog bounded context) |
-| **Status** | 🟢 Backend implemented — [`apps/api/src/modules/catalog`](../../apps/api/src/modules/catalog) (27 tests · Swagger · validation) |
+| **Status** | 🟢 Backend implemented — [`apps/api/src/modules/catalog`](../../apps/api/src/modules/catalog) (27 tests · Swagger · validation) · 🟢 Frontend implemented — [`apps/web/src/features/products`](../../apps/web/src/features/products) ([§12](#12-frontend)) |
 | **Phase** | 6–7 — Module design (API + Backend), documentation-first |
 | **Depends on** | [ARCHITECTURE.md](../ARCHITECTURE.md) · [DATABASE.md](../DATABASE.md) · [AUTHENTICATION.md](../AUTHENTICATION.md) |
 | **Authoritative sources** | DATABASE §4 (catalog) · AUTHENTICATION §10 (permissions) · [`.claude/api/*`](../../.claude/api) · [`.claude/backend/*`](../../.claude/backend) |
@@ -310,3 +310,53 @@ modules/catalog/                 (Product is the first slice)
 🔵 **In review.** On approval this drives the `packages/types` catalog schemas, the API spec entries, and
 the `modules/catalog` backend implementation (Phase 7) on top of the existing API foundation. One
 upstream sync required: add `draft` to DATABASE §4.1.
+
+---
+
+## 12. Frontend
+
+🟢 **Implemented** — Phase 8 (Frontend) for this module, built entirely on `@stockflow/ui` (cardinal rule),
+TanStack Query for server state, and React Hook Form + Zod for forms.
+
+### 12.1 Layering (`apps/web/src/features/products`)
+```
+lib/api/                 apiRequest seam · typed ApiError · dev tenant headers   (app-wide)
+features/products/
+  api.ts                 one fn per endpoint (§5); validates responses via shared Zod contracts
+  query-keys.ts          hierarchical key factory
+  queries.ts             useProducts (keepPreviousData) · useProduct · useVariants
+  mutations.ts           create/update/archive/restore/delete (+ variant ops); own cache invalidation
+  lib/money.ts           major↔minor conversion (float-safe)
+  lib/product-form.schema.ts   form-shape schemas + request mappers (ADR-014)
+  lib/form-errors.ts     map server VALIDATION_ERROR details onto RHF fields
+  components/            status badges · details/variant fields · create+edit form · variant dialog ·
+                         table (server-sorted) · filters · browser (URL state) · detail view
+app/(app)/products/      list · new · [productId] (detail) · [productId]/edit · loading
+```
+
+### 12.2 Decisions
+> **Decision** — server state lives **only** in TanStack Query; mutations own invalidation, components own
+> toasts/navigation/field-error mapping. **Why** — one source of truth for cache correctness; UX feedback
+> stays where the context is. **Rejected** — mirroring server data into Zustand (two sources, drift).
+
+> **Decision** — list **sorting/paging/filtering is server-driven** and **kept in the URL**. **Why** —
+> correctness across the whole result set (TanStack `DataGrid` only sorts the current page) and shareable,
+> back-button-friendly state. We compose the lower-level `Table` primitives + `Pagination` rather than the
+> client-only `DataGrid`. **Rejected** — client-side sort/paginate over one page (wrong totals/order).
+
+> **Decision** — output is validated against the shared response schemas at the client boundary; requests
+> use thin **form** schemas + mappers, re-validated authoritatively by the API (ADR-014).
+
+### 12.3 Wired today vs. deferred
+| Concern | Today | Becomes |
+|---------|-------|---------|
+| Tenant context | dev headers outside prod (mirrors `DevAuthGuard`, ADR-013) | Better Auth session/cookies |
+| Permission gating (UI mirror) | server enforces; nav/actions shown unconditionally | `@RequirePermission` → UI `PermissionWrapper` once RBAC lands |
+| Category/Brand/Unit inputs | raw 24-char id text fields | Select pickers (Catalog sub-modules) — no form-contract change |
+| Images / attributes | omitted | image upload (Cloudinary/files) + attribute editor |
+| Bulk import UI | omitted | upload → `POST /products/import` (202) + job progress |
+| Component/integration tests | pure-logic vitest (mappers/money/errors/keys) + `Field` RTL in UI | jsdom + Testing Library + MSW flows |
+
+### 12.4 New shared primitive
+`Field` (label/description/error/aria host) was added to `@stockflow/ui` to make accessible forms
+composable without hand-rolled markup — see [`docs/components/field.md`](../components/field.md) and ADR-012.

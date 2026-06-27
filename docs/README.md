@@ -33,7 +33,7 @@ Per-module design specs (entities · DTOs · validation · API · permissions ·
 
 | Module | Bounded context | Status |
 |--------|-----------------|--------|
-| [Product](./modules/product.md) | Catalog | 🟢 Backend implemented (in-memory adapter · 27 tests · Swagger) |
+| [Product](./modules/product.md) | Catalog | 🟢 Backend implemented (in-memory adapter · 27 tests · Swagger) · 🟢 Frontend implemented (TanStack Query · RHF + Zod · 32 tests) |
 
 ## Component specs
 
@@ -46,6 +46,7 @@ is the first and doubles as the spec template.
 | [Input](./components/input.md) | ✅ Implemented (11 tests + stories) |
 | [Textarea](./components/textarea.md) | ✅ Implemented (11 tests + stories) |
 | [Select](./components/select.md) | ✅ Implemented (8 tests + stories) |
+| [Field](./components/field.md) | ✅ Implemented (label/error/aria host · 8 tests + stories) |
 | [Checkbox](./components/checkbox.md) | ✅ Implemented (9 tests + stories) |
 | [Switch](./components/switch.md) | ✅ Implemented (7 tests + stories) |
 | [Radio](./components/radio.md) | ✅ Implemented (7 tests + stories) |
