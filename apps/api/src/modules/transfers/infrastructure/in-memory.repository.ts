@@ -54,6 +54,15 @@ export class InMemoryTransferRepository implements TransferRepository {
     return Promise.resolve({ items: page, total });
   }
 
+  countByStatus(organizationId: string): Promise<Record<string, number>> {
+    const tally: Record<string, number> = {};
+    for (const transfer of this.store.values()) {
+      if (transfer.organizationId !== organizationId) continue;
+      tally[transfer.status] = (tally[transfer.status] ?? 0) + 1;
+    }
+    return Promise.resolve(tally);
+  }
+
   nextNumber(organizationId: string): Promise<string> {
     const next = (this.counters.get(organizationId) ?? 0) + 1;
     this.counters.set(organizationId, next);

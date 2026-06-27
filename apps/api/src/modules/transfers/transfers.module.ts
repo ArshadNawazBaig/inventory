@@ -23,6 +23,7 @@ import {
   type TransferRepository,
 } from './application/ports';
 import { TransfersService } from './application/transfers.service';
+import { TransfersQuery } from './application/transfers-query.service';
 import { InMemoryTransferRepository } from './infrastructure/in-memory.repository';
 import { InventoryStockMover } from './infrastructure/adapters';
 import { TransferController } from './presentation/transfer.controller';
@@ -69,6 +70,8 @@ import { TransferController } from './presentation/transfer.controller';
         clock: ResourceClock,
       ): TransfersService => new TransfersService(repo, catalog, locations, mover, ids, clock),
     },
+    TransfersQuery,
   ],
+  exports: [TransfersQuery],
 })
 export class TransfersModule {}

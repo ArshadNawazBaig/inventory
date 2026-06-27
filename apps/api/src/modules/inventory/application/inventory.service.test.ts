@@ -80,7 +80,7 @@ function make() {
     new FixedClock(),
     events,
   );
-  const query = new InventoryQuery(levels);
+  const query = new InventoryQuery(levels, movements);
   return { movements, levels, references, policy, events, service, query };
 }
 
@@ -191,5 +191,18 @@ describe('InventoryQuery.getVariantStockSummary', () => {
     await ctx.service.adjust(actor, { variantId: V1, locationId: L2, delta: 8 });
     const summary = await ctx.query.getVariantStockSummary('org-1', V1);
     expect(summary).toEqual({ onHand: 13, reserved: 0, inTransit: 0, hasOpenOrders: false });
+  });
+});
+
+describe('InventoryQuery.listRecentMovements', () => {
+  it('returns the newest ledger entries, mapped to the feed shape, tenant-scoped', async () => {
+    const ctx = make();
+    await ctx.service.adjust(actor, { variantId: V1, locationId: L1, delta: 5 });
+    await ctx.service.adjust(actor, { variantId: V1, locationId: L2, delta: 7 });
+    const recent = await ctx.query.listRecentMovements('org-1', 10);
+    expect(recent).toHaveLength(2);
+    expect(recent[0]).toMatchObject({ variantId: V1, reasonKind: 'manual', type: 'adjustment' });
+    expect(recent.every((m) => typeof m.id === 'string' && m.createdAt instanceof Date)).toBe(true);
+    expect(await ctx.query.listRecentMovements('org-2', 10)).toEqual([]);
   });
 });

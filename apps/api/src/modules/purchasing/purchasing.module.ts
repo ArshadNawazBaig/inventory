@@ -27,6 +27,7 @@ import {
   type WarehouseLocationRef,
 } from './application/ports';
 import { PurchasingService } from './application/purchasing.service';
+import { PurchasingQuery } from './application/purchasing-query.service';
 import { InMemoryPurchaseOrderRepository } from './infrastructure/in-memory.repository';
 import { InventoryReceiptPoster } from './infrastructure/adapters';
 import { PurchaseOrderController } from './presentation/purchase-order.controller';
@@ -81,6 +82,8 @@ import { PurchaseOrderController } from './presentation/purchase-order.controlle
       ): PurchasingService =>
         new PurchasingService(repo, catalog, suppliers, locations, receipts, ids, clock),
     },
+    PurchasingQuery,
   ],
+  exports: [PurchasingQuery],
 })
 export class PurchasingModule {}

@@ -8,6 +8,8 @@ export interface PurchaseOrderRepository {
   findById(organizationId: string, id: string): Promise<PurchaseOrderEntity | null>;
   update(organizationId: string, id: string, patch: Partial<PurchaseOrderEntity>): Promise<PurchaseOrderEntity | null>;
   list(organizationId: string, query: PurchaseOrderListQuery): Promise<{ items: PurchaseOrderEntity[]; total: number }>;
+  /** Tally of orders per status for the tenant — the basis for dashboard KPIs. */
+  countByStatus(organizationId: string): Promise<Record<string, number>>;
   nextNumber(organizationId: string): Promise<string>;
 }
 

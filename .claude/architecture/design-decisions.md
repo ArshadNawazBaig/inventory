@@ -315,6 +315,42 @@ dependency — is recorded here with context, decision, and consequences.
   summary, inventory aging, dead stock, PO/SO summaries); multi-currency valuation; caching/materialized
   read-models at scale. Permission keys `report.{view,export}` to sync into AUTHENTICATION §10.
 
+### ADR-027 — Dashboard: read-only overview composing existing read-models
+- Status: Accepted · Context: Wave 7 (last module). The overview needs headline KPIs + charts but should not
+  introduce a new source of truth or duplicate aggregations that already exist.
+- Decision: a **Dashboard module** that owns no collection and returns one `GET /dashboard/summary` payload by
+  composing existing read-models. It **reuses `ReportsService`** (valuation + low-stock — Reports now exports
+  its service) rather than re-deriving them; sources open/in-transit KPIs from new per-module read services
+  **`PurchasingQuery`/`SalesQuery`/`TransfersQuery.countByStatus`** (zero-filled to the complete status set,
+  backed by a repo `countByStatus`); and builds an enriched recent-activity feed from
+  **`InventoryQuery.listRecentMovements`** joined with `CatalogQuery.getVariantSnapshot` +
+  `LocationQuery.getLocationLabel`. All dependencies are one-way, bound by identity to those services (no writes,
+  no cycles); the service returns the response shape directly (no domain entity). "Open" = non-terminal order
+  statuses; "in transit" = transfers in `in_transit` + `partially_received`.
+- Consequences: a glanceable overview with zero new infra and no duplicated math; the new `countByStatus` seams
+  map cleanly onto a future Mongo `$group`. Rejected: duplicating valuation/low-stock in the dashboard; counting
+  by paging order lists or reaching into other modules' repositories; caching/materialising before there's load.
+  Follow-ups: activity feed from the audit trail; per-period trends (movements over time) once the worker is
+  wired; configurable widgets; summary caching at scale. Permission key `dashboard.view` to sync into
+  AUTHENTICATION §10.
+
+### ADR-028 — Settings: organization singleton that owns the Inventory stock policy
+- Status: Accepted · Context: Wave 8. Several stubs await tenant configuration — most concretely Inventory's
+  `InventoryPolicyPort`, whose code comment promised it would be "backed by the tenant's
+  `settings.allowNegativeStock` once the Settings module lands."
+- Decision: a **Settings module** owning a per-tenant **singleton** (`OrganizationSettings`:
+  `defaultCurrency`, `timezone`, `allowNegativeStock`, `lowStockAlertsEnabled`). `GET /settings` returns the
+  saved doc or **ephemeral safe defaults without persisting** (a read has no side effects); `PATCH /settings`
+  is a partial merge. Settings depends on nothing and exports `SettingsQuery`; the **Inventory module binds its
+  `INVENTORY_POLICY` to `SettingsQuery.allowNegativeStock`**, replacing the hardcoded `DefaultInventoryPolicy`
+  — so negative-stock policy is now tenant-configurable. One-way (Inventory → Settings); no cycle.
+- Consequences: Settings is useful from day one (it changes real ledger behaviour, verified by smoke), and the
+  policy seam is the template for future policy keys. Rejected: create-on-read (a write on a safe GET); leaving
+  the policy hardcoded; duplicating the flag inside Inventory. Follow-ups: org profile (name, logo) once an
+  organizations module lands; member-scoped preferences; more policy keys (valuation method, reservation
+  policy); low-stock alert delivery via the notification fan-out. Permission keys `settings.{view,manage}` to
+  sync into AUTHENTICATION §10.
+
 ## Open decisions (need ratification)
 - Package manager/task runner (pnpm + Turborepo proposed).
 - Inventory valuation method default (weighted-average proposed).

@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { rootLogger } from '../../../common/logging/logger';
 import { CatalogQuery } from '../../catalog/application/catalog-query.service';
 import { LocationQuery } from '../../locations/application/location-query.service';
+import { SettingsQuery } from '../../settings/application/settings-query.service';
 import type { InventoryEvent } from '../domain/entities';
 import type { InventoryEventPublisher, InventoryPolicyPort, InventoryReferencePort } from '../application/ports';
 
@@ -26,9 +27,20 @@ export class CatalogLocationReference implements InventoryReferencePort {
 }
 
 /**
- * Default stock policy — disallows negative on-hand. Backed by the tenant's `settings.allowNegativeStock`
- * once the Settings module lands; until then it fails closed (no negative stock).
+ * Tenant stock policy backed by the Settings module — reads `settings.allowNegativeStock` (defaults to
+ * fail-closed when unset). Delegates to the Settings query surface (one-way dep; no cycle), so operators
+ * control whether the ledger may drive on-hand below zero.
  */
+@Injectable()
+export class SettingsInventoryPolicy implements InventoryPolicyPort {
+  constructor(private readonly settings: SettingsQuery) {}
+
+  allowNegativeStock(organizationId: string): Promise<boolean> {
+    return this.settings.allowNegativeStock(organizationId);
+  }
+}
+
+/** Fail-closed fallback policy (no negative stock) — retained for tests and offline contexts. */
 @Injectable()
 export class DefaultInventoryPolicy implements InventoryPolicyPort {
   allowNegativeStock(_organizationId: string): Promise<boolean> {

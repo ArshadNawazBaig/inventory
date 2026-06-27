@@ -8,6 +8,8 @@ export interface TransferRepository {
   findById(organizationId: string, id: string): Promise<TransferEntity | null>;
   update(organizationId: string, id: string, patch: Partial<TransferEntity>): Promise<TransferEntity | null>;
   list(organizationId: string, query: TransferListQuery): Promise<{ items: TransferEntity[]; total: number }>;
+  /** Tally of transfers per status for the tenant — the basis for dashboard KPIs. */
+  countByStatus(organizationId: string): Promise<Record<string, number>>;
   nextNumber(organizationId: string): Promise<string>;
 }
 

@@ -12,6 +12,7 @@ import {
 import { ConfigModule } from './config';
 import { HealthController } from './health/health.controller';
 import { AuditModule } from './modules/audit/audit.module';
+import { DashboardModule } from './modules/dashboard/dashboard.module';
 import { NotificationsModule } from './modules/notifications/notifications.module';
 import { CatalogLookupsModule } from './modules/catalog-lookups/catalog-lookups.module';
 import { CatalogModule } from './modules/catalog/catalog.module';
@@ -22,6 +23,7 @@ import { PurchasingModule } from './modules/purchasing/purchasing.module';
 import { ReportsModule } from './modules/reports/reports.module';
 import { ReturnsModule } from './modules/returns/returns.module';
 import { SalesModule } from './modules/sales/sales.module';
+import { SettingsModule } from './modules/settings/settings.module';
 import { TransfersModule } from './modules/transfers/transfers.module';
 
 /**
@@ -32,6 +34,7 @@ import { TransfersModule } from './modules/transfers/transfers.module';
 @Module({
   imports: [
     ConfigModule,
+    SettingsModule,
     CatalogLookupsModule,
     CatalogModule,
     LocationsModule,
@@ -44,6 +47,7 @@ import { TransfersModule } from './modules/transfers/transfers.module';
     AuditModule,
     NotificationsModule,
     ReportsModule,
+    DashboardModule,
   ],
   controllers: [HealthController],
   providers: [

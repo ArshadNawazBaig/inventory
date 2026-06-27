@@ -27,6 +27,7 @@ import {
   type WarehouseLocationRef,
 } from './application/ports';
 import { SalesService } from './application/sales.service';
+import { SalesQuery } from './application/sales-query.service';
 import { InMemorySalesOrderRepository } from './infrastructure/in-memory.repository';
 import { InventoryShipmentPoster } from './infrastructure/adapters';
 import { SalesOrderController } from './presentation/sales-order.controller';
@@ -80,6 +81,8 @@ import { SalesOrderController } from './presentation/sales-order.controller';
         clock: ResourceClock,
       ): SalesService => new SalesService(repo, catalog, customers, locations, shipments, ids, clock),
     },
+    SalesQuery,
   ],
+  exports: [SalesQuery],
 })
 export class SalesModule {}

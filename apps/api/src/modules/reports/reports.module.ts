@@ -50,5 +50,6 @@ import { ReportController } from './presentation/report.controller';
       ): ReportsService => new ReportsService(inventory, catalog, locations),
     },
   ],
+  exports: [ReportsService],
 })
 export class ReportsModule {}

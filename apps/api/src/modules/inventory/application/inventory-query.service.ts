@@ -1,6 +1,12 @@
 import { Inject, Injectable } from '@nestjs/common';
+import type { MovementReasonKind, StockMovementType } from '@stockflow/types';
 import type { VariantStockSummary } from '../domain/entities';
-import { STOCK_LEVEL_REPOSITORY, type StockLevelRepository } from './ports';
+import {
+  STOCK_LEVEL_REPOSITORY,
+  STOCK_MOVEMENT_REPOSITORY,
+  type StockLevelRepository,
+  type StockMovementRepository,
+} from './ports';
 
 /** A flattened (variant × location) projection row — the stable read shape reports aggregate over. */
 export interface StockLevelView {
@@ -9,6 +15,17 @@ export interface StockLevelView {
   onHand: number;
   avgCostMinor: number | null;
   currency: string | null;
+}
+
+/** A recent ledger entry — the raw read shape the Dashboard enriches into an activity feed. */
+export interface RecentMovementView {
+  id: string;
+  type: StockMovementType;
+  reasonKind: MovementReasonKind;
+  delta: number;
+  variantId: string;
+  locationId: string;
+  createdAt: Date;
 }
 
 /**
@@ -24,6 +41,7 @@ export interface StockLevelView {
 export class InventoryQuery {
   constructor(
     @Inject(STOCK_LEVEL_REPOSITORY) private readonly levels: StockLevelRepository,
+    @Inject(STOCK_MOVEMENT_REPOSITORY) private readonly movements: StockMovementRepository,
   ) {}
 
   async getVariantStockSummary(organizationId: string, variantId: string): Promise<VariantStockSummary> {
@@ -48,6 +66,20 @@ export class InventoryQuery {
       onHand: cell.onHand,
       avgCostMinor: cell.avgCostMinor,
       currency: cell.currency,
+    }));
+  }
+
+  /** The most recent ledger entries for the tenant (newest first) — consumed by the Dashboard feed. */
+  async listRecentMovements(organizationId: string, limit: number): Promise<RecentMovementView[]> {
+    const { items } = await this.movements.list(organizationId, { page: 1, limit, sort: '-createdAt' });
+    return items.map((m) => ({
+      id: m.id,
+      type: m.type,
+      reasonKind: m.reason.kind,
+      delta: m.delta,
+      variantId: m.variantId,
+      locationId: m.locationId,
+      createdAt: m.createdAt,
     }));
   }
 }

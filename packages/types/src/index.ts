@@ -85,3 +85,9 @@ export * from './notifications';
 
 // Reports (read-only cross-module analytics) contracts.
 export * from './reports';
+
+// Dashboard (read-only overview composing other read-models) contracts.
+export * from './dashboard';
+
+// Settings (organization singleton — preferences + stock policy) contracts.
+export * from './settings';

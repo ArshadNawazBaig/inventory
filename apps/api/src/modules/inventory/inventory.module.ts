@@ -4,6 +4,8 @@ import { CatalogModule } from '../catalog/catalog.module';
 import { CatalogQuery } from '../catalog/application/catalog-query.service';
 import { LocationsModule } from '../locations/locations.module';
 import { LocationQuery } from '../locations/application/location-query.service';
+import { SettingsModule } from '../settings/settings.module';
+import { SettingsQuery } from '../settings/application/settings-query.service';
 import {
   INVENTORY_CLOCK,
   INVENTORY_EVENT_PUBLISHER,
@@ -28,8 +30,8 @@ import {
 } from './infrastructure/in-memory.repositories';
 import {
   CatalogLocationReference,
-  DefaultInventoryPolicy,
   LoggingInventoryEventPublisher,
+  SettingsInventoryPolicy,
 } from './infrastructure/adapters';
 import { InventoryController } from './presentation/inventory.controller';
 
@@ -41,12 +43,16 @@ import { InventoryController } from './presentation/inventory.controller';
  * (the read-model) for future consumers.
  */
 @Module({
-  imports: [CatalogModule, LocationsModule],
+  imports: [CatalogModule, LocationsModule, SettingsModule],
   controllers: [InventoryController],
   providers: [
     { provide: STOCK_MOVEMENT_REPOSITORY, useClass: InMemoryStockMovementRepository },
     { provide: STOCK_LEVEL_REPOSITORY, useClass: InMemoryStockLevelRepository },
-    { provide: INVENTORY_POLICY, useClass: DefaultInventoryPolicy },
+    {
+      provide: INVENTORY_POLICY,
+      inject: [SettingsQuery],
+      useFactory: (settings: SettingsQuery): InventoryPolicyPort => new SettingsInventoryPolicy(settings),
+    },
     { provide: INVENTORY_ID_GENERATOR, useValue: new ObjectIdGenerator() },
     { provide: INVENTORY_CLOCK, useValue: new SystemClock() },
     { provide: INVENTORY_EVENT_PUBLISHER, useValue: new LoggingInventoryEventPublisher() },

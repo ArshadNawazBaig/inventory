@@ -45,6 +45,8 @@ Per-module design specs (entities · DTOs · validation · API · permissions ·
 | [Audit](./modules/audit.md) | Cross-cutting | 🟢 Backend implemented (immutable append-only trail · global interceptor records every successful mutation · route→action deriver · read API w/ filters · 18 tests) · 🟢 Frontend implemented (filterable viewer + detail modal · 4 tests) |
 | [Notifications](./modules/notifications.md) | Cross-cutting | 🟢 Backend implemented (per-recipient inbox · curated interceptor (reuses audit deriver) notifies on noteworthy transitions · list/unread-count/mark-read/mark-all · 13 tests) · 🟢 Frontend implemented (navbar bell w/ unread badge + popover · page w/ filters · 3 tests) |
 | [Reports](./modules/reports.md) | Analytics | 🟢 Backend implemented (read-only cross-module aggregations · inventory valuation @ weighted-avg cost w/ by-warehouse breakdown · catalog-driven low-stock incl. out-of-stock · 11 tests) · 🟢 Frontend implemented (valuation KPIs + Recharts bar chart + tables · low-stock reorder table · tabs · 2 tests) |
+| [Dashboard](./modules/dashboard.md) | Analytics | 🟢 Backend implemented (read-only overview composing Reports valuation + low-stock, order status counts, enriched ledger feed · `*Query.countByStatus` seams · 14 tests) · 🟢 Frontend implemented (KPI tiles · value-by-warehouse chart · reorder list · recent-activity feed · 3 tests) |
+| [Settings](./modules/settings.md) | Platform | 🟢 Backend implemented (organization singleton · preferences + `allowNegativeStock` policy now backing the Inventory ledger via `SettingsQuery` · 13 tests) · 🟢 Frontend implemented (RHF + Zod form · currency/timezone selects · policy toggles · 4 tests) |
 
 ## Component specs
 

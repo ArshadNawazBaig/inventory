@@ -55,6 +55,15 @@ export class InMemoryPurchaseOrderRepository implements PurchaseOrderRepository 
     return Promise.resolve({ items: page, total });
   }
 
+  countByStatus(organizationId: string): Promise<Record<string, number>> {
+    const tally: Record<string, number> = {};
+    for (const order of this.store.values()) {
+      if (order.organizationId !== organizationId) continue;
+      tally[order.status] = (tally[order.status] ?? 0) + 1;
+    }
+    return Promise.resolve(tally);
+  }
+
   nextNumber(organizationId: string): Promise<string> {
     const next = (this.counters.get(organizationId) ?? 0) + 1;
     this.counters.set(organizationId, next);
