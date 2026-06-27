@@ -14,10 +14,12 @@
     "@stockflow/config": "workspace:*",
     "@stockflow/icons": "workspace:*",
     "@stockflow/ui": "workspace:*",
+    "@tanstack/react-query": "^5.62.0",
     "next": "^15.1.3",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
-    "recharts": "^3.9.0"
+    "recharts": "^3.9.0",
+    "zustand": "^5.0.0"
   },
   "devDependencies": {
     "@stockflow/tsconfig": "workspace:*",

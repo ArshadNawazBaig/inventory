@@ -17,6 +17,7 @@ export {
   SlidersHorizontal as AdjustmentIcon,
   ClipboardList as CountIcon,
   RotateCw as ReorderIcon,
+  BarChart3 as ReportIcon,
   Building2 as SupplierIcon,
   ShoppingCart as PurchaseOrderIcon,
   ShoppingBag as SalesOrderIcon,

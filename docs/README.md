@@ -26,6 +26,15 @@ implemented before its documentation has been written and approved.
 
 **Legend:** 🟢 Approved · 🟡 Awaiting approval · 🔵 In review · ⚪ Not started
 
+## Module specs
+
+Per-module design specs (entities · DTOs · validation · API · permissions · workflow) live in
+[`modules/`](./modules/).
+
+| Module | Bounded context | Status |
+|--------|-----------------|--------|
+| [Product](./modules/product.md) | Catalog | 🔵 In review |
+
 ## Component specs
 
 Per-component design specs live in [`components/`](./components/). [`button.md`](./components/button.md)
