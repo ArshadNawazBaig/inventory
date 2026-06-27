@@ -20,6 +20,7 @@ import {
   SidebarTrigger,
 } from '@stockflow/ui';
 import { ThemeToggle } from '@/components/theme/theme-toggle';
+import { NotificationBell } from '@/features/notifications/components/notification-bell';
 import { APP_NAV } from './app-nav';
 
 /**
@@ -75,6 +76,7 @@ export function AppShell({ children }: { children: ReactNode }) {
           <SidebarTrigger />
           <NavbarSpacer />
           <NavbarActions>
+            <NotificationBell />
             <ThemeToggle />
             <Avatar size="sm" name="StockFlow Team" />
           </NavbarActions>

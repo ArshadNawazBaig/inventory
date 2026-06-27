@@ -9,4 +9,5 @@ export * from './http/contextual-request';
 export * from './interceptors';
 export * from './logging';
 export * from './middleware';
+export * from './notifications';
 export * from './pipes';

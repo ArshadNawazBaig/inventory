@@ -280,6 +280,24 @@ dependency — is recorded here with context, decision, and consequences.
   **denials** (403/tenant/rate-limit); async **export** (`audit.export`) via BullMQ; Mongoose adapter (immutable
   collection + per-tenant retention). Permission keys `audit.{view,export}` to sync into AUTHENTICATION §10.
 
+### ADR-025 — Notifications: curated interceptor + per-recipient inbox (actor as recipient for now)
+- Status: Accepted · Context: Wave 7. An in-app notification system needs producers (what's noteworthy) and
+  recipients (who to tell) — but there is **no Members/roles module yet**, so "who" is only partly knowable.
+- Decision: a **per-recipient inbox** (`notifications`, one row per user, with `readAt` read state) fed by a
+  **curated** global `NotificationInterceptor`. Unlike audit (records every mutation), it matches a small
+  **allow-list** of state transitions (PO submitted/received · SO confirmed/fulfilled · transfer
+  dispatched/completed · return completed), **reusing the audit route deriver** then a pure rules table for
+  copy + deep link. Producers write through a cross-cutting **`NOTIFIER`** port (mirrors `AUDIT_RECORDER`),
+  bound to `NotificationService`. **Recipient = the acting user** this wave. Read/manage API
+  (`list`/`unread-count`/`mark-read`/`mark-all`) is strictly scoped to the actor (`notification.view`;
+  cross-recipient → 404). Frontend: a navbar bell (polled unread badge + popover) + a `/notifications` page.
+- Consequences: uniform coverage of all modules with zero per-module churn and no new deps (`NotificationsModule`
+  depends on nothing; interceptor wired once) → no cycles; consistent with ADR-024. The actor-as-recipient is a
+  deliberate placeholder. Rejected: notifying on every mutation (noise); per-service wiring (churn); blocking on
+  Members. Follow-ups: **role/member fan-out** (notify the *other* relevant users), **email** (Resend) +
+  **realtime** (Socket.IO) delivery via the worker/queue, low-stock alerts from the inventory event stream, user
+  preferences, Mongoose adapter. Permission key `notification.view` to sync into AUTHENTICATION §10.
+
 ## Open decisions (need ratification)
 - Package manager/task runner (pnpm + Turborepo proposed).
 - Inventory valuation method default (weighted-average proposed).

@@ -79,3 +79,6 @@ export * from './returns';
 
 // Audit logs (immutable who-did-what trail) contracts.
 export * from './audit';
+
+// Notifications (per-recipient in-app inbox) contracts.
+export * from './notifications';
