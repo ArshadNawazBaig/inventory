@@ -1,5 +1,7 @@
 import type { LucideIcon } from '@stockflow/icons';
 import {
+  BrandIcon,
+  CategoryIcon,
   DashboardIcon,
   LocationIcon,
   ProductIcon,
@@ -8,6 +10,7 @@ import {
   ReportIcon,
   SalesOrderIcon,
   SettingsIcon,
+  UnitIcon,
 } from '@stockflow/icons';
 
 export interface NavItem {
@@ -32,9 +35,17 @@ export const APP_NAV: NavGroup[] = [
     items: [{ label: 'Dashboard', href: '/dashboard', icon: DashboardIcon }],
   },
   {
-    title: 'Inventory',
+    title: 'Catalog',
     items: [
       { label: 'Products', href: '/products', icon: ProductIcon },
+      { label: 'Categories', href: '/categories', icon: CategoryIcon },
+      { label: 'Brands', href: '/brands', icon: BrandIcon },
+      { label: 'Units', href: '/units', icon: UnitIcon },
+    ],
+  },
+  {
+    title: 'Inventory',
+    items: [
       { label: 'Inventory', href: '/inventory', icon: ProductsIcon },
       { label: 'Locations', href: '/locations', icon: LocationIcon },
     ],

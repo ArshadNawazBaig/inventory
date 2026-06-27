@@ -28,7 +28,7 @@ import {
   type ProductDetailsValues,
   type VariantFormValues,
 } from '../lib/product-form.schema';
-import { applyApiErrorToForm } from '../lib/form-errors';
+import { applyApiErrorToForm } from '@/lib/forms';
 import { errorMessage } from '@/lib/api';
 import { useCreateProduct, useUpdateProduct } from '../mutations';
 import { ProductDetailsFields } from './product-details-fields';
@@ -89,6 +89,7 @@ export function CreateProductForm() {
         </CardHeader>
         <CardContent>
           <ProductDetailsFields
+            control={control}
             register={(key) => register(key)}
             errorFor={(key) => errors[key]?.message}
             disabled={isSubmitting}
@@ -171,6 +172,7 @@ export function EditProductForm({ product }: { product: ProductResponse }) {
   });
   const {
     register,
+    control,
     handleSubmit,
     setError,
     formState: { errors, isSubmitting },
@@ -202,6 +204,7 @@ export function EditProductForm({ product }: { product: ProductResponse }) {
         </CardHeader>
         <CardContent>
           <ProductDetailsFields
+            control={control}
             register={(key) => register(key)}
             errorFor={(key) => errors[key]?.message}
             disabled={isSubmitting}

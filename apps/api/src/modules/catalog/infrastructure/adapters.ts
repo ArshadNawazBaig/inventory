@@ -1,6 +1,7 @@
 import { randomUUID } from 'node:crypto';
 import { Injectable } from '@nestjs/common';
 import { rootLogger } from '../../../common/logging/logger';
+import { CatalogLookupQuery } from '../../catalog-lookups/application/catalog-lookup-query.service';
 import type {
   CatalogReferencePort,
   Clock,
@@ -37,19 +38,21 @@ export class StubInventoryQuery implements InventoryQueryPort {
 }
 
 /**
- * Stub reference checks — accepts all references until the Category/Brand/Unit
- * modules exist (no taxonomy to validate against yet). Replaced per those modules.
+ * Real reference checks — delegates to the Catalog Lookups module's public query surface so a
+ * product's category/brand/unit must exist (live, same tenant). Replaces the former stub.
  */
 @Injectable()
-export class StubCatalogReference implements CatalogReferencePort {
-  categoryExists(_organizationId: string, _id: string): Promise<boolean> {
-    return Promise.resolve(true);
+export class LookupCatalogReference implements CatalogReferencePort {
+  constructor(private readonly lookups: CatalogLookupQuery) {}
+
+  categoryExists(organizationId: string, id: string): Promise<boolean> {
+    return this.lookups.categoryExists(organizationId, id);
   }
-  brandExists(_organizationId: string, _id: string): Promise<boolean> {
-    return Promise.resolve(true);
+  brandExists(organizationId: string, id: string): Promise<boolean> {
+    return this.lookups.brandExists(organizationId, id);
   }
-  unitExists(_organizationId: string, _id: string): Promise<boolean> {
-    return Promise.resolve(true);
+  unitExists(organizationId: string, id: string): Promise<boolean> {
+    return this.lookups.unitExists(organizationId, id);
   }
 }
 

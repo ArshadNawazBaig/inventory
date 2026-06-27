@@ -15,10 +15,12 @@ import {
   VARIANT_REPOSITORY,
   type VariantRepository,
 } from './application/ports';
+import { CatalogLookupsModule } from '../catalog-lookups/catalog-lookups.module';
+import { CatalogLookupQuery } from '../catalog-lookups/application/catalog-lookup-query.service';
 import { ProductService } from './application/product.service';
 import {
   LoggingEventPublisher,
-  StubCatalogReference,
+  LookupCatalogReference,
   StubInventoryQuery,
   SystemClock,
   UuidIdGenerator,
@@ -35,12 +37,18 @@ import { ProductController } from './presentation/product.controller';
  * one-line change here — the application layer is untouched (dependency inversion).
  */
 @Module({
+  imports: [CatalogLookupsModule],
   controllers: [ProductController],
   providers: [
     { provide: PRODUCT_REPOSITORY, useClass: InMemoryProductRepository },
     { provide: VARIANT_REPOSITORY, useClass: InMemoryVariantRepository },
     { provide: INVENTORY_QUERY, useClass: StubInventoryQuery },
-    { provide: CATALOG_REFERENCE, useClass: StubCatalogReference },
+    {
+      provide: CATALOG_REFERENCE,
+      inject: [CatalogLookupQuery],
+      useFactory: (lookups: CatalogLookupQuery): CatalogReferencePort =>
+        new LookupCatalogReference(lookups),
+    },
     { provide: EVENT_PUBLISHER, useClass: LoggingEventPublisher },
     { provide: ID_GENERATOR, useClass: UuidIdGenerator },
     { provide: CLOCK, useClass: SystemClock },

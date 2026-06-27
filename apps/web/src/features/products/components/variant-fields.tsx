@@ -39,7 +39,11 @@ export function VariantFields({ register, errorFor, disabled = false }: VariantF
         </FieldControl>
       </Field>
 
-      <Field label="Unit id" description="24-char id (optional)" error={errorFor('unitId')}>
+      <Field
+        label="Unit id"
+        description="Optional — defaults to the product's base unit. (Picker to follow.)"
+        error={errorFor('unitId')}
+      >
         <FieldControl>
           <Input placeholder="Defaults to base unit" autoComplete="off" disabled={disabled} {...register('unitId')} />
         </FieldControl>

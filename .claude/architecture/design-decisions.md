@@ -104,6 +104,22 @@ dependency — is recorded here with context, decision, and consequences.
   done manually (not `* 100`) to avoid float error; a 2-decimal minor exponent is assumed (zero/three-
   decimal currencies are a documented follow-up).
 
+### ADR-015 — Catalog Lookups as a shared-base lookup family (Categories · Brands · Units)
+- Status: Accepted · Context: Product references category/brand/unit by id and stubbed their existence
+  (`StubCatalogReference`). The three are near-identical tenant-scoped reference entities.
+- Decision: implement them as **one module** behind a generic `LookupService<T>`/`LookupRepository<T>`
+  base (shared CRUD + name uniqueness + soft-delete/restore), with thin concrete services for the
+  type-specific rules (category parent + cycle check, unit code uniqueness). The module **exports a
+  `CatalogLookupQuery`**; the Catalog module binds its `CATALOG_REFERENCE` port to a delegating adapter
+  (`LookupCatalogReference`) — replacing the stub. Frontend mirrors this with a generic `LookupManager`
+  + `LookupSelect` (config/descriptor-driven), and the Product form's id-inputs become real pickers.
+- Consequences: a product's references are now validated (live, same tenant → 422 otherwise); the next
+  simple lookup is cheap. **In-memory lookup ids are 12-byte hex (ObjectId-shaped), not UUIDs**, because
+  reference fields are validated as 24-char hex — UUIDs would fail those validators (caught in
+  integration). Dependency direction is catalog → lookups. Deferred: a delete-in-use guard (needs a
+  usage read-model; would cycle), slug + full category-tree endpoints, and a variant-unit picker.
+- Permissions: six new keys (`{category,brand,unit}.{view,manage}`) to sync into AUTHENTICATION §10.
+
 ## Open decisions (need ratification)
 - Package manager/task runner (pnpm + Turborepo proposed).
 - Inventory valuation method default (weighted-average proposed).

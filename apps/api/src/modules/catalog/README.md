@@ -22,7 +22,7 @@ repository. Cross-context stock facts come through `InventoryQueryPort` (read-on
 |---------|-------|---------|
 | Persistence | `InMemory*Repository` (singletons) | Mongoose adapters (DB module) — same ports |
 | Stock guards | `StubInventoryQuery` (returns zero) | real `InventoryQueryPort` (Inventory module) |
-| References (category/brand/unit) | `StubCatalogReference` (accepts all) | real checks (taxonomy modules) |
+| References (category/brand/unit) | ✅ `LookupCatalogReference` → Catalog Lookups module (live, same-tenant checks) | Mongoose-backed lookups (DB module) |
 | Tenant context | `DevAuthGuard` (header, non-prod only; fails closed in prod) | Better Auth `AuthContext` |
 | Permissions | `@RequirePermission(...)` metadata (declared) | enforced by RBAC `PermissionGuard` (auth module) |
 | Events | `LoggingEventPublisher` (Pino) | event bus / outbox (queues phase) |

@@ -13,7 +13,7 @@ import {
   variantToFormValues,
   type VariantFormValues,
 } from '../lib/product-form.schema';
-import { applyApiErrorToForm } from '../lib/form-errors';
+import { applyApiErrorToForm } from '@/lib/forms';
 import { errorMessage } from '@/lib/api';
 import { useAddVariant, useUpdateVariant } from '../mutations';
 import { VariantFields } from './variant-fields';

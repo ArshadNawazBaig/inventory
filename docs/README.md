@@ -34,6 +34,7 @@ Per-module design specs (entities · DTOs · validation · API · permissions ·
 | Module | Bounded context | Status |
 |--------|-----------------|--------|
 | [Product](./modules/product.md) | Catalog | 🟢 Backend implemented (in-memory adapter · 27 tests · Swagger) · 🟢 Frontend implemented (TanStack Query · RHF + Zod · 32 tests) |
+| [Catalog Lookups](./modules/catalog-lookups.md) | Catalog | 🟢 Backend implemented (Categories · Brands · Units · shared base · 17 tests) · 🟢 Frontend implemented (generic LookupManager + pickers · 11 tests) — replaces Product's `StubCatalogReference` |
 
 ## Component specs
 

@@ -352,7 +352,7 @@ app/(app)/products/      list · new · [productId] (detail) · [productId]/edit
 |---------|-------|---------|
 | Tenant context | dev headers outside prod (mirrors `DevAuthGuard`, ADR-013) | Better Auth session/cookies |
 | Permission gating (UI mirror) | server enforces; nav/actions shown unconditionally | `@RequirePermission` → UI `PermissionWrapper` once RBAC lands |
-| Category/Brand/Unit inputs | raw 24-char id text fields | Select pickers (Catalog sub-modules) — no form-contract change |
+| Category/Brand/Unit references | ✅ real `LookupSelect` pickers + server-validated existence (ADR-015) | — (variant-level unit picker still a text input; follow-up) |
 | Images / attributes | omitted | image upload (Cloudinary/files) + attribute editor |
 | Bulk import UI | omitted | upload → `POST /products/import` (202) + job progress |
 | Component/integration tests | pure-logic vitest (mappers/money/errors/keys) + `Field` RTL in UI | jsdom + Testing Library + MSW flows |

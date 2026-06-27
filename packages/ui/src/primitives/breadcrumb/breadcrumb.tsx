@@ -25,7 +25,7 @@ export const BreadcrumbList = forwardRef<HTMLOListElement, HTMLAttributes<HTMLOL
       <ol
         ref={ref}
         className={cn(
-          'flex flex-wrap items-center gap-1.5 break-words text-sm text-muted-foreground sm:gap-2.5',
+          'flex flex-wrap items-center gap-1.5 wrap-break-word text-sm text-muted-foreground sm:gap-2.5',
           className,
         )}
         {...props}
@@ -37,7 +37,9 @@ export const BreadcrumbList = forwardRef<HTMLOListElement, HTMLAttributes<HTMLOL
 /** A single crumb (wraps a link, the current page, or an ellipsis). */
 export const BreadcrumbItem = forwardRef<HTMLLIElement, LiHTMLAttributes<HTMLLIElement>>(
   function BreadcrumbItem({ className, ...props }, ref) {
-    return <li ref={ref} className={cn('inline-flex items-center gap-1.5', className)} {...props} />;
+    return (
+      <li ref={ref} className={cn('inline-flex items-center gap-1.5', className)} {...props} />
+    );
   },
 );
 

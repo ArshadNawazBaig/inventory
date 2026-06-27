@@ -33,7 +33,7 @@ import {
 } from '../mutations';
 import { ProductStatusBadge, VariantStatusBadge } from './status-badge';
 import { VariantFormDialog } from './variant-form-dialog';
-import { ConfirmDialog } from './confirm-dialog';
+import { ConfirmDialog } from '@/components/confirm-dialog';
 
 const dateFormatter = new Intl.DateTimeFormat('en-US', { dateStyle: 'medium', timeStyle: 'short' });
 function formatDate(iso: string): string {

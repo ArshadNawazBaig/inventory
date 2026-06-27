@@ -9,6 +9,7 @@ import {
 } from './common';
 import { ConfigModule } from './config';
 import { HealthController } from './health/health.controller';
+import { CatalogLookupsModule } from './modules/catalog-lookups/catalog-lookups.module';
 import { CatalogModule } from './modules/catalog/catalog.module';
 
 /**
@@ -17,7 +18,7 @@ import { CatalogModule } from './modules/catalog/catalog.module';
  * and the business modules.
  */
 @Module({
-  imports: [ConfigModule, CatalogModule],
+  imports: [ConfigModule, CatalogLookupsModule, CatalogModule],
   controllers: [HealthController],
   providers: [
     { provide: APP_FILTER, useClass: AllExceptionsFilter },

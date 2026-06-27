@@ -52,3 +52,6 @@ export type HealthResponse = z.infer<typeof HealthResponseSchema>;
 
 // Catalog (Product module) contracts.
 export * from './catalog';
+
+// Catalog lookups (Categories · Brands · Units) contracts.
+export * from './catalog-lookups';
