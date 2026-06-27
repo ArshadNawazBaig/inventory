@@ -13,7 +13,7 @@ implemented before its documentation has been written and approved.
 | [ROADMAP.md](./ROADMAP.md) | 🟡 Awaiting approval | 1 — Documentation |
 | [REPOSITORY_STRUCTURE.md](./REPOSITORY_STRUCTURE.md) | 🟡 Awaiting approval | 3 — Architecture |
 | [PROJECT_SETUP.md](./PROJECT_SETUP.md) | ✅ Executed (P0 bootstrapped) | P0 — Foundations |
-| [ARCHITECTURE.md](./ARCHITECTURE.md) | ⚪ Not started | 3 — Architecture |
+| [ARCHITECTURE.md](./ARCHITECTURE.md) | 🔵 In review — authored, awaiting approval | 3 — Architecture |
 | [DATABASE.md](./DATABASE.md) | ⚪ Not started | 5 — Database |
 | [API_SPEC.md](./API_SPEC.md) | ⚪ Not started | 6 — API |
 | [SECURITY.md](./SECURITY.md) | ⚪ Not started | Cross-cutting |
