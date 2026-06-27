@@ -1,24 +1,25 @@
 import type { LookupListQuery, PageMeta } from '@stockflow/types';
 import { apiRequest } from '@/lib/api';
-import type { LookupDescriptor } from './descriptors';
-import type { LookupRecord } from './types';
+import type { ResourceDescriptor } from './descriptor';
+import type { ResourceRecord } from './types';
 
-export interface LookupListResult<T> {
+export interface ResourceListResult<T> {
   data: T[];
   meta: PageMeta;
 }
 
 /**
- * Generic REST bindings for any catalog lookup, parameterised by a {@link LookupDescriptor}. Each call
- * validates the response against the resource's shared Zod contract (output validation). Transport only;
- * caching/invalidation lives in the hooks.
+ * Generic REST bindings for any managed resource, parameterised by a {@link ResourceDescriptor}. Each
+ * call validates the response against the resource's shared Zod contract (output validation). Transport
+ * only; caching/invalidation lives in the hooks. (`LookupListQuery` is the canonical named-resource list
+ * query shape — page/limit/sort/status/q — reused across all CRUD resources.)
  */
 
-export function listLookups<T extends LookupRecord>(
-  descriptor: LookupDescriptor<T>,
+export function listResources<T extends ResourceRecord>(
+  descriptor: ResourceDescriptor<T>,
   query: LookupListQuery,
   signal?: AbortSignal,
-): Promise<LookupListResult<T>> {
+): Promise<ResourceListResult<T>> {
   return apiRequest(`/v1/${descriptor.resource}`, {
     query: {
       page: query.page,
@@ -32,8 +33,8 @@ export function listLookups<T extends LookupRecord>(
   });
 }
 
-export function getLookup<T extends LookupRecord>(
-  descriptor: LookupDescriptor<T>,
+export function getResource<T extends ResourceRecord>(
+  descriptor: ResourceDescriptor<T>,
   id: string,
   signal?: AbortSignal,
 ): Promise<T> {
@@ -43,8 +44,8 @@ export function getLookup<T extends LookupRecord>(
   });
 }
 
-export function createLookup<T extends LookupRecord>(
-  descriptor: LookupDescriptor<T>,
+export function createResource<T extends ResourceRecord>(
+  descriptor: ResourceDescriptor<T>,
   body: unknown,
 ): Promise<T> {
   return apiRequest(`/v1/${descriptor.resource}`, {
@@ -54,8 +55,8 @@ export function createLookup<T extends LookupRecord>(
   });
 }
 
-export function updateLookup<T extends LookupRecord>(
-  descriptor: LookupDescriptor<T>,
+export function updateResource<T extends ResourceRecord>(
+  descriptor: ResourceDescriptor<T>,
   id: string,
   body: unknown,
 ): Promise<T> {
@@ -66,8 +67,8 @@ export function updateLookup<T extends LookupRecord>(
   });
 }
 
-export function archiveLookup<T extends LookupRecord>(
-  descriptor: LookupDescriptor<T>,
+export function archiveResource<T extends ResourceRecord>(
+  descriptor: ResourceDescriptor<T>,
   id: string,
 ): Promise<T> {
   return apiRequest(`/v1/${descriptor.resource}/${id}/archive`, {
@@ -76,8 +77,8 @@ export function archiveLookup<T extends LookupRecord>(
   });
 }
 
-export function restoreLookup<T extends LookupRecord>(
-  descriptor: LookupDescriptor<T>,
+export function restoreResource<T extends ResourceRecord>(
+  descriptor: ResourceDescriptor<T>,
   id: string,
 ): Promise<T> {
   return apiRequest(`/v1/${descriptor.resource}/${id}/restore`, {
@@ -86,8 +87,8 @@ export function restoreLookup<T extends LookupRecord>(
   });
 }
 
-export function deleteLookup<T extends LookupRecord>(
-  descriptor: LookupDescriptor<T>,
+export function deleteResource<T extends ResourceRecord>(
+  descriptor: ResourceDescriptor<T>,
   id: string,
 ): Promise<void> {
   return apiRequest<void>(`/v1/${descriptor.resource}/${id}`, { method: 'DELETE' });

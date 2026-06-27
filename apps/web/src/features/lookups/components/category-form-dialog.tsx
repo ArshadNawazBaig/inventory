@@ -7,8 +7,9 @@ import { Button, Field, Modal, toast } from '@stockflow/ui';
 import type { CategoryResponse } from '@stockflow/types';
 import { errorMessage } from '@/lib/api';
 import { applyApiErrorToForm } from '@/lib/forms';
+import { useCreateResource, useUpdateResource } from '@/features/resources/mutations';
+import { ResourceSelect } from '@/features/resources/components/resource-select';
 import { CATEGORIES } from '../descriptors';
-import { useCreateLookup, useUpdateLookup } from '../mutations';
 import {
   categoryFormSchema,
   categoryToForm,
@@ -18,7 +19,6 @@ import {
   type CategoryFormValues,
 } from '../lib/forms';
 import { LookupBaseFields } from './lookup-base-fields';
-import { LookupSelect } from './lookup-select';
 
 export interface CategoryFormDialogProps {
   open: boolean;
@@ -29,8 +29,8 @@ export interface CategoryFormDialogProps {
 export function CategoryFormDialog({ open, editing, onOpenChange }: CategoryFormDialogProps) {
   const formId = useId();
   const isEdit = Boolean(editing);
-  const create = useCreateLookup(CATEGORIES);
-  const update = useUpdateLookup(CATEGORIES);
+  const create = useCreateResource(CATEGORIES);
+  const update = useUpdateResource(CATEGORIES);
 
   const form = useForm<CategoryFormValues>({
     resolver: zodResolver(categoryFormSchema),
@@ -99,7 +99,7 @@ export function CategoryFormDialog({ open, editing, onOpenChange }: CategoryForm
             control={control}
             name="parentId"
             render={({ field }) => (
-              <LookupSelect
+              <ResourceSelect
                 descriptor={CATEGORIES}
                 value={field.value}
                 onChange={field.onChange}

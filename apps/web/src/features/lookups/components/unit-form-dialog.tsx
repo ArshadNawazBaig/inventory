@@ -7,8 +7,8 @@ import { Button, Field, FieldControl, Input, Modal, toast } from '@stockflow/ui'
 import type { UnitResponse } from '@stockflow/types';
 import { errorMessage } from '@/lib/api';
 import { applyApiErrorToForm } from '@/lib/forms';
+import { useCreateResource, useUpdateResource } from '@/features/resources/mutations';
 import { UNITS } from '../descriptors';
-import { useCreateLookup, useUpdateLookup } from '../mutations';
 import {
   emptyUnitForm,
   toCreateUnit,
@@ -28,8 +28,8 @@ export interface UnitFormDialogProps {
 export function UnitFormDialog({ open, editing, onOpenChange }: UnitFormDialogProps) {
   const formId = useId();
   const isEdit = Boolean(editing);
-  const create = useCreateLookup(UNITS);
-  const update = useUpdateLookup(UNITS);
+  const create = useCreateResource(UNITS);
+  const update = useUpdateResource(UNITS);
 
   const form = useForm<UnitFormValues>({
     resolver: zodResolver(unitFormSchema),

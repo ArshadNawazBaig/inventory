@@ -1,38 +1,40 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import type { LookupListQuery } from '@stockflow/types';
 import type { ActorContext } from '../../../common/auth/actor-context';
-import type { LookupEvent } from '../domain/entities';
 import {
-  DuplicateLookupError,
-  InvalidParentError,
-  LookupNotFoundError,
-} from '../domain/lookup.errors';
+  DuplicateResourceError,
+  ResourceNotFoundError,
+  type ResourceClock,
+  type ResourceEvent,
+  type ResourceEventPublisher,
+  type ResourceIdGenerator,
+} from '../../../common/resource';
+import { InvalidParentError } from '../domain/lookup.errors';
 import {
   InMemoryBrandRepository,
   InMemoryCategoryRepository,
   InMemoryUnitRepository,
 } from '../infrastructure/in-memory.repositories';
-import type { Clock, IdGenerator, LookupEventPublisher } from './ports';
 import { BrandService, CategoryService, UnitService } from './lookup.service';
 
 const actor: ActorContext = { organizationId: 'org-1', actorId: 'user-1' };
 const otherTenant: ActorContext = { organizationId: 'org-2', actorId: 'user-2' };
 const LIST: LookupListQuery = { page: 1, limit: 20, sort: 'name' };
 
-class SeqIds implements IdGenerator {
+class SeqIds implements ResourceIdGenerator {
   private n = 0;
   generate(): string {
     return `id-${++this.n}`;
   }
 }
-class FixedClock implements Clock {
+class FixedClock implements ResourceClock {
   now(): Date {
     return new Date('2026-01-01T00:00:00.000Z');
   }
 }
-class RecordingEvents implements LookupEventPublisher {
-  readonly events: LookupEvent[] = [];
-  publish(event: LookupEvent): void {
+class RecordingEvents implements ResourceEventPublisher {
+  readonly events: ResourceEvent[] = [];
+  publish(event: ResourceEvent): void {
     this.events.push(event);
   }
 }
@@ -71,14 +73,14 @@ describe('CategoryService', () => {
   it('rejects a duplicate name (case-insensitive)', async () => {
     await ctx.service.create(actor, { name: 'Tools' });
     await expect(ctx.service.create(actor, { name: 'tools' })).rejects.toBeInstanceOf(
-      DuplicateLookupError,
+      DuplicateResourceError,
     );
   });
 
   it('isolates tenants', async () => {
     const created = await ctx.service.create(actor, { name: 'Tools' });
     await expect(ctx.service.get(otherTenant, created.id)).rejects.toBeInstanceOf(
-      LookupNotFoundError,
+      ResourceNotFoundError,
     );
     // The same name is free in another tenant.
     await expect(ctx.service.create(otherTenant, { name: 'Tools' })).resolves.toBeDefined();
@@ -109,7 +111,7 @@ describe('CategoryService', () => {
     expect((await ctx.service.restore(actor, created.id)).status).toBe('active');
 
     await ctx.service.remove(actor, created.id);
-    await expect(ctx.service.get(actor, created.id)).rejects.toBeInstanceOf(LookupNotFoundError);
+    await expect(ctx.service.get(actor, created.id)).rejects.toBeInstanceOf(ResourceNotFoundError);
 
     // Soft delete frees the name for reuse.
     await expect(ctx.service.create(actor, { name: 'Tools' })).resolves.toBeDefined();
@@ -134,7 +136,7 @@ describe('UnitService', () => {
     const { service } = makeUnits();
     await service.create(actor, { name: 'Kilogram', code: 'kg' });
     await expect(service.create(actor, { name: 'Kilo', code: 'KG' })).rejects.toBeInstanceOf(
-      DuplicateLookupError,
+      DuplicateResourceError,
     );
   });
 

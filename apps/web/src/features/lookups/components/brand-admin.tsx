@@ -1,14 +1,15 @@
 'use client';
 
 import type { BrandResponse } from '@stockflow/types';
+import { ResourceManager } from '@/features/resources/components/resource-manager';
 import { BRANDS } from '../descriptors';
 import { BrandFormDialog } from './brand-form-dialog';
-import { LookupManager } from './lookup-manager';
 
 export function BrandAdmin() {
   return (
-    <LookupManager<BrandResponse>
+    <ResourceManager<BrandResponse>
       descriptor={BRANDS}
+      subtitle="Identify the makers of your products."
       columns={[
         {
           header: 'Website',

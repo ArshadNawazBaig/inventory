@@ -2,143 +2,31 @@ import type {
   CreateBrandRequest,
   CreateCategoryRequest,
   CreateUnitRequest,
-  LookupListQuery,
   UpdateBrandRequest,
   UpdateCategoryRequest,
   UpdateUnitRequest,
 } from '@stockflow/types';
 import type { ActorContext } from '../../../common/auth/actor-context';
-import type {
-  BrandEntity,
-  CategoryEntity,
-  LookupAction,
-  LookupEntity,
-  LookupResource,
-  UnitEntity,
-} from '../domain/entities';
-import { DuplicateLookupError, InvalidParentError, LookupNotFoundError } from '../domain/lookup.errors';
-import { codeKey, nameKey, normalizeName } from '../domain/name';
-import type {
-  Clock,
-  IdGenerator,
-  LookupEventPublisher,
-  LookupRepository,
-  UnitRepository,
-} from './ports';
-
-export interface ListResult<T> {
-  items: T[];
-  total: number;
-  page: number;
-  limit: number;
-}
-
-/**
- * Shared use cases for every catalog lookup (framework-free). Holds the invariants common to all three —
- * name uniqueness, status transitions, soft-delete/restore — and the standard read/list paths. Concrete
- * services add their type-specific rules (category parent/cycle, unit code uniqueness).
- */
-export abstract class LookupService<T extends LookupEntity> {
-  protected constructor(
-    protected readonly resource: LookupResource,
-    protected readonly repo: LookupRepository<T>,
-    protected readonly ids: IdGenerator,
-    protected readonly clock: Clock,
-    protected readonly events: LookupEventPublisher,
-  ) {}
-
-  async get(ctx: ActorContext, id: string): Promise<T> {
-    const found = await this.repo.findById(ctx.organizationId, id);
-    if (!found) throw new LookupNotFoundError(this.resource, id);
-    return found;
-  }
-
-  async list(ctx: ActorContext, query: LookupListQuery): Promise<ListResult<T>> {
-    const { items, total } = await this.repo.list(ctx.organizationId, query);
-    return { items, total, page: query.page, limit: query.limit };
-  }
-
-  async archive(ctx: ActorContext, id: string): Promise<T> {
-    const updated = await this.setStatus(ctx, id, 'archived');
-    this.emit('archived', ctx.organizationId, id);
-    return updated;
-  }
-
-  async restore(ctx: ActorContext, id: string): Promise<T> {
-    const org = ctx.organizationId;
-    const existing = await this.repo.findById(org, id, { withDeleted: true });
-    if (!existing) throw new LookupNotFoundError(this.resource, id);
-    // A restored name must not collide with one taken while it was gone.
-    await this.assertNameAvailable(org, existing.name, id);
-    const updated = await this.repo.update(
-      org,
-      id,
-      this.stamp(ctx, { status: 'active', deletedAt: null } as Partial<T>),
-    );
-    if (!updated) throw new LookupNotFoundError(this.resource, id);
-    this.emit('restored', org, id);
-    return updated;
-  }
-
-  async remove(ctx: ActorContext, id: string): Promise<void> {
-    const org = ctx.organizationId;
-    const existing = await this.repo.findById(org, id);
-    if (!existing) throw new LookupNotFoundError(this.resource, id);
-    await this.repo.update(org, id, this.stamp(ctx, { deletedAt: this.clock.now() } as Partial<T>));
-    this.emit('deleted', org, id);
-  }
-
-  // ─── helpers for concrete services ─────────────────────────────────────────
-  protected async assertNameAvailable(org: string, name: string, exceptId?: string): Promise<void> {
-    const existing = await this.repo.findLiveByName(org, name);
-    if (existing && existing.id !== exceptId) {
-      throw new DuplicateLookupError(this.resource, 'name', normalizeName(name));
-    }
-  }
-
-  protected envelope(ctx: ActorContext, now: Date): Omit<LookupEntity, 'name' | 'description'> {
-    return {
-      id: this.ids.generate(),
-      organizationId: ctx.organizationId,
-      status: 'active',
-      createdAt: now,
-      updatedAt: now,
-      deletedAt: null,
-      createdBy: ctx.actorId,
-      updatedBy: ctx.actorId,
-    };
-  }
-
-  protected stamp(ctx: ActorContext, patch: Partial<T>): Partial<T> {
-    return { ...patch, updatedAt: this.clock.now(), updatedBy: ctx.actorId };
-  }
-
-  protected emit(action: LookupAction, organizationId: string, entityId: string): void {
-    this.events.publish({ resource: this.resource, action, organizationId, entityId });
-  }
-
-  protected async requireLive(org: string, id: string): Promise<T> {
-    const existing = await this.repo.findById(org, id);
-    if (!existing) throw new LookupNotFoundError(this.resource, id);
-    return existing;
-  }
-
-  private async setStatus(ctx: ActorContext, id: string, status: T['status']): Promise<T> {
-    const org = ctx.organizationId;
-    await this.requireLive(org, id);
-    const updated = await this.repo.update(org, id, this.stamp(ctx, { status } as Partial<T>));
-    if (!updated) throw new LookupNotFoundError(this.resource, id);
-    return updated;
-  }
-}
+import {
+  ResourceService,
+  ResourceNotFoundError,
+  nameKey,
+  normalizeName,
+  type ResourceClock,
+  type ResourceEventPublisher,
+  type ResourceIdGenerator,
+  type ResourceRepository,
+} from '../../../common/resource';
+import type { BrandEntity, CategoryEntity, UnitEntity } from '../domain/entities';
+import { InvalidParentError } from '../domain/lookup.errors';
 
 // ─── Category ──────────────────────────────────────────────────────────────────
-export class CategoryService extends LookupService<CategoryEntity> {
+export class CategoryService extends ResourceService<CategoryEntity> {
   constructor(
-    repo: LookupRepository<CategoryEntity>,
-    ids: IdGenerator,
-    clock: Clock,
-    events: LookupEventPublisher,
+    repo: ResourceRepository<CategoryEntity>,
+    ids: ResourceIdGenerator,
+    clock: ResourceClock,
+    events: ResourceEventPublisher,
   ) {
     super('category', repo, ids, clock, events);
   }
@@ -172,7 +60,7 @@ export class CategoryService extends LookupService<CategoryEntity> {
       patch.parentId = input.parentId;
     }
     const updated = await this.repo.update(org, id, this.stamp(ctx, patch));
-    if (!updated) throw new LookupNotFoundError('category', id);
+    if (!updated) throw new ResourceNotFoundError('category', id);
     this.emit('updated', org, id);
     return updated;
   }
@@ -202,12 +90,12 @@ export class CategoryService extends LookupService<CategoryEntity> {
 }
 
 // ─── Brand ──────────────────────────────────────────────────────────────────────
-export class BrandService extends LookupService<BrandEntity> {
+export class BrandService extends ResourceService<BrandEntity> {
   constructor(
-    repo: LookupRepository<BrandEntity>,
-    ids: IdGenerator,
-    clock: Clock,
-    events: LookupEventPublisher,
+    repo: ResourceRepository<BrandEntity>,
+    ids: ResourceIdGenerator,
+    clock: ResourceClock,
+    events: ResourceEventPublisher,
   ) {
     super('brand', repo, ids, clock, events);
   }
@@ -236,27 +124,27 @@ export class BrandService extends LookupService<BrandEntity> {
     if (input.description !== undefined) patch.description = input.description;
     if (input.website !== undefined) patch.website = input.website;
     const updated = await this.repo.update(org, id, this.stamp(ctx, patch));
-    if (!updated) throw new LookupNotFoundError('brand', id);
+    if (!updated) throw new ResourceNotFoundError('brand', id);
     this.emit('updated', org, id);
     return updated;
   }
 }
 
 // ─── Unit ─────────────────────────────────────────────────────────────────────
-export class UnitService extends LookupService<UnitEntity> {
+export class UnitService extends ResourceService<UnitEntity> {
   constructor(
-    private readonly units: UnitRepository,
-    ids: IdGenerator,
-    clock: Clock,
-    events: LookupEventPublisher,
+    repo: ResourceRepository<UnitEntity>,
+    ids: ResourceIdGenerator,
+    clock: ResourceClock,
+    events: ResourceEventPublisher,
   ) {
-    super('unit', units, ids, clock, events);
+    super('unit', repo, ids, clock, events);
   }
 
   async create(ctx: ActorContext, input: CreateUnitRequest): Promise<UnitEntity> {
     const org = ctx.organizationId;
     await this.assertNameAvailable(org, input.name);
-    await this.assertCodeAvailable(org, input.code);
+    await this.assertFieldAvailable(org, 'code', input.code);
     const created = await this.repo.insert({
       ...this.envelope(ctx, this.clock.now()),
       name: normalizeName(input.name),
@@ -274,22 +162,15 @@ export class UnitService extends LookupService<UnitEntity> {
     if (input.name !== undefined && nameKey(input.name) !== nameKey(existing.name)) {
       await this.assertNameAvailable(org, input.name, id);
     }
-    if (input.code !== undefined && codeKey(input.code) !== codeKey(existing.code)) {
-      await this.assertCodeAvailable(org, input.code, id);
+    if (input.code !== undefined && nameKey(input.code) !== nameKey(existing.code)) {
+      await this.assertFieldAvailable(org, 'code', input.code, id);
     }
     if (input.name !== undefined) patch.name = normalizeName(input.name);
     if (input.description !== undefined) patch.description = input.description;
     if (input.code !== undefined) patch.code = normalizeName(input.code);
     const updated = await this.repo.update(org, id, this.stamp(ctx, patch));
-    if (!updated) throw new LookupNotFoundError('unit', id);
+    if (!updated) throw new ResourceNotFoundError('unit', id);
     this.emit('updated', org, id);
     return updated;
-  }
-
-  private async assertCodeAvailable(org: string, code: string, exceptId?: string): Promise<void> {
-    const existing = await this.units.findLiveByCode(org, code);
-    if (existing && existing.id !== exceptId) {
-      throw new DuplicateLookupError('unit', 'code', normalizeName(code));
-    }
   }
 }

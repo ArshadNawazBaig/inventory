@@ -1,15 +1,17 @@
 import { Module } from '@nestjs/common';
+import type {
+  ResourceClock,
+  ResourceEventPublisher,
+  ResourceIdGenerator,
+} from '../../common/resource';
 import {
   BRAND_REPOSITORY,
   type BrandRepository,
   CATEGORY_REPOSITORY,
   type CategoryRepository,
-  type Clock,
-  type IdGenerator,
   LOOKUP_CLOCK,
   LOOKUP_EVENT_PUBLISHER,
   LOOKUP_ID_GENERATOR,
-  type LookupEventPublisher,
   UNIT_REPOSITORY,
   type UnitRepository,
 } from './application/ports';
@@ -32,9 +34,9 @@ import {
 } from './presentation/lookups.controllers';
 
 /**
- * Catalog Lookups module (Categories · Brands · Units). Ports are bound to in-memory + stub adapters
- * until the database module lands; swapping to Mongoose is a one-line change here. Exports
- * `CatalogLookupQuery` so the Product module can validate references against real data.
+ * Catalog Lookups module (Categories · Brands · Units). Built on the shared `common/resource` base; ports
+ * are bound to in-memory + stub adapters until the database module lands. Exports `CatalogLookupQuery` so
+ * the Product module can validate references against real data.
  */
 @Module({
   controllers: [CategoryController, BrandController, UnitController],
@@ -50,9 +52,9 @@ import {
       inject: [CATEGORY_REPOSITORY, LOOKUP_ID_GENERATOR, LOOKUP_CLOCK, LOOKUP_EVENT_PUBLISHER],
       useFactory: (
         repo: CategoryRepository,
-        ids: IdGenerator,
-        clock: Clock,
-        events: LookupEventPublisher,
+        ids: ResourceIdGenerator,
+        clock: ResourceClock,
+        events: ResourceEventPublisher,
       ): CategoryService => new CategoryService(repo, ids, clock, events),
     },
     {
@@ -60,9 +62,9 @@ import {
       inject: [BRAND_REPOSITORY, LOOKUP_ID_GENERATOR, LOOKUP_CLOCK, LOOKUP_EVENT_PUBLISHER],
       useFactory: (
         repo: BrandRepository,
-        ids: IdGenerator,
-        clock: Clock,
-        events: LookupEventPublisher,
+        ids: ResourceIdGenerator,
+        clock: ResourceClock,
+        events: ResourceEventPublisher,
       ): BrandService => new BrandService(repo, ids, clock, events),
     },
     {
@@ -70,9 +72,9 @@ import {
       inject: [UNIT_REPOSITORY, LOOKUP_ID_GENERATOR, LOOKUP_CLOCK, LOOKUP_EVENT_PUBLISHER],
       useFactory: (
         repo: UnitRepository,
-        ids: IdGenerator,
-        clock: Clock,
-        events: LookupEventPublisher,
+        ids: ResourceIdGenerator,
+        clock: ResourceClock,
+        events: ResourceEventPublisher,
       ): UnitService => new UnitService(repo, ids, clock, events),
     },
     CatalogLookupQuery,

@@ -11,6 +11,7 @@ import { ConfigModule } from './config';
 import { HealthController } from './health/health.controller';
 import { CatalogLookupsModule } from './modules/catalog-lookups/catalog-lookups.module';
 import { CatalogModule } from './modules/catalog/catalog.module';
+import { PartiesModule } from './modules/parties/parties.module';
 
 /**
  * API root module. Wires the cross-cutting foundation (validated config, global
@@ -18,7 +19,7 @@ import { CatalogModule } from './modules/catalog/catalog.module';
  * and the business modules.
  */
 @Module({
-  imports: [ConfigModule, CatalogLookupsModule, CatalogModule],
+  imports: [ConfigModule, CatalogLookupsModule, CatalogModule, PartiesModule],
   controllers: [HealthController],
   providers: [
     { provide: APP_FILTER, useClass: AllExceptionsFilter },

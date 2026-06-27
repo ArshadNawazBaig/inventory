@@ -7,7 +7,7 @@ import type {
   UpdateVariantRequest,
   VariantResponse,
 } from '@stockflow/types';
-import { formatMinorToMajor, parseMajorToMinor } from './money';
+import { formatMinorToMajor, parseMajorToMinor } from '@/lib/money';
 
 /**
  * Form-shaped schemas + request mappers for the Product module UI.

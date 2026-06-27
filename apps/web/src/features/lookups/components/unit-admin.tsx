@@ -1,14 +1,15 @@
 'use client';
 
 import type { UnitResponse } from '@stockflow/types';
+import { ResourceManager } from '@/features/resources/components/resource-manager';
 import { UNITS } from '../descriptors';
-import { LookupManager } from './lookup-manager';
 import { UnitFormDialog } from './unit-form-dialog';
 
 export function UnitAdmin() {
   return (
-    <LookupManager<UnitResponse>
+    <ResourceManager<UnitResponse>
       descriptor={UNITS}
+      subtitle="Units of measure for products and variants."
       columns={[
         {
           header: 'Code',

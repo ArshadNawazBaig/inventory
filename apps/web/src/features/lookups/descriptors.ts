@@ -1,4 +1,3 @@
-import type { ZodType } from 'zod';
 import {
   BrandListResponseSchema,
   BrandResponseSchema,
@@ -8,25 +7,12 @@ import {
   UnitResponseSchema,
   type BrandResponse,
   type CategoryResponse,
-  type PageMeta,
   type UnitResponse,
 } from '@stockflow/types';
-import type { LookupRecord } from './types';
+import type { ResourceDescriptor } from '@/features/resources/descriptor';
 
-/**
- * Everything generic lookup code needs to talk to one resource: its path segment, display names, and the
- * shared Zod contracts for output validation. One descriptor per lookup; the generic api/query/manager
- * code is parameterised by it.
- */
-export interface LookupDescriptor<T extends LookupRecord> {
-  resource: string;
-  singular: string;
-  plural: string;
-  responseSchema: ZodType<T>;
-  listSchema: ZodType<{ data: T[]; meta: PageMeta }>;
-}
-
-export const CATEGORIES: LookupDescriptor<CategoryResponse> = {
+/** Resource descriptors for the three catalog lookups — consumed by the generic resource toolkit. */
+export const CATEGORIES: ResourceDescriptor<CategoryResponse> = {
   resource: 'categories',
   singular: 'Category',
   plural: 'Categories',
@@ -34,7 +20,7 @@ export const CATEGORIES: LookupDescriptor<CategoryResponse> = {
   listSchema: CategoryListResponseSchema,
 };
 
-export const BRANDS: LookupDescriptor<BrandResponse> = {
+export const BRANDS: ResourceDescriptor<BrandResponse> = {
   resource: 'brands',
   singular: 'Brand',
   plural: 'Brands',
@@ -42,7 +28,7 @@ export const BRANDS: LookupDescriptor<BrandResponse> = {
   listSchema: BrandListResponseSchema,
 };
 
-export const UNITS: LookupDescriptor<UnitResponse> = {
+export const UNITS: ResourceDescriptor<UnitResponse> = {
   resource: 'units',
   singular: 'Unit',
   plural: 'Units',

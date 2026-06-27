@@ -1,8 +1,9 @@
 import type { BrandResponse, CategoryResponse, UnitResponse } from '@stockflow/types';
-import type { BrandEntity, CategoryEntity, LookupEntity, UnitEntity } from '../domain/entities';
+import type { ResourceEntity } from '../../../common/resource';
+import type { BrandEntity, CategoryEntity, UnitEntity } from '../domain/entities';
 
 /** Shared envelope mapper (domain → response); no entity/Mongoose leakage to clients. */
-function base(entity: LookupEntity): Omit<CategoryResponse, 'parentId'> {
+function base(entity: ResourceEntity & { description: string | null }): Omit<CategoryResponse, 'parentId'> {
   return {
     id: entity.id,
     name: entity.name,

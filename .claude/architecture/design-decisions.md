@@ -120,6 +120,32 @@ dependency — is recorded here with context, decision, and consequences.
   usage read-model; would cycle), slug + full category-tree endpoints, and a variant-unit picker.
 - Permissions: six new keys (`{category,brand,unit}.{view,manage}`) to sync into AUTHENTICATION §10.
 
+### ADR-016 — Shared resource toolkits (frontend `features/resources` + backend `common/resource`)
+- Status: Accepted · Context: catalog lookups and parties (and most future simple CRUD modules) are all
+  tenant-scoped, named, status'd, soft-deletable resources with identical list/admin/lifecycle behaviour.
+- Decision: extract the generic pieces once and reuse them:
+  - **Frontend** `features/resources` — `ResourceDescriptor`, generic api/query/mutation hooks,
+    `ResourceManager` (search + status filter + pagination + edit/archive/restore/delete), and
+    `ResourceSelect` (picker). Resources supply only a descriptor, extra columns, and a concrete form dialog.
+  - **Backend** `common/resource` — `ResourceEntity`, `ResourceRepository<T>` port, `ResourceService<T>`
+    base (CRUD + name/field uniqueness + soft-delete/restore), `InMemoryResourceRepository<T>`, and the
+    generic `ResourceNotFoundError`/`DuplicateResourceError`. Catalog Lookups was refactored onto it.
+- Consequences: a new simple-CRUD module is now a thin descriptor + form, not a copy. Uniqueness beyond
+  `name` is supported via `assertFieldAvailable(field)` (unit `code`, party `code`); restore re-checks via
+  an overridable `assertRestorable` hook (parties override it because their names are not unique). The
+  `money` helper was promoted to `@/lib/money` (shared by product prices + customer credit limits).
+
+### ADR-017 — Parties (Suppliers · Customers) on the shared base
+- Status: Accepted · Context: Wave 2 of the post-Product roadmap; the external parties PO/SO will reference.
+- Decision: one `parties` module with `SupplierService`/`CustomerService` on `ResourceService`; parties are
+  keyed by an optional unique `code` (names not unique), carry contact fields + an embedded `Address`, and
+  add type-specific fields (supplier: currency/paymentTerms/leadTimeDays; customer: customerType/creditLimit).
+- Consequences: no cross-module reference export yet (`PartyQuery` arrives with Purchasing/Sales); delete is
+  soft-only (referential guard deferred to the order read-models). Four permission keys
+  (`{supplier,customer}.{view,manage}`) to sync into AUTHENTICATION §10. **Note:** archive/restore POST
+  actions currently return 201 (Nest default) where docs say 200 — harmless (2xx); a `@HttpCode(200)`
+  standardization across product/lookups/parties is a small follow-up.
+
 ## Open decisions (need ratification)
 - Package manager/task runner (pnpm + Turborepo proposed).
 - Inventory valuation method default (weighted-average proposed).

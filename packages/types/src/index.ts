@@ -55,3 +55,6 @@ export * from './catalog';
 
 // Catalog lookups (Categories · Brands · Units) contracts.
 export * from './catalog-lookups';
+
+// Parties (Suppliers · Customers) contracts.
+export * from './parties';

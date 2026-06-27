@@ -1,14 +1,15 @@
 'use client';
 
 import type { CategoryResponse } from '@stockflow/types';
+import { ResourceManager } from '@/features/resources/components/resource-manager';
 import { CATEGORIES } from '../descriptors';
 import { CategoryFormDialog } from './category-form-dialog';
-import { LookupManager } from './lookup-manager';
 
 export function CategoryAdmin() {
   return (
-    <LookupManager<CategoryResponse>
+    <ResourceManager<CategoryResponse>
       descriptor={CATEGORIES}
+      subtitle="Classify products into a browsable tree."
       columns={[
         {
           header: 'Parent',

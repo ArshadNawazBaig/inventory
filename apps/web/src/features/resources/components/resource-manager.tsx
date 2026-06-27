@@ -23,13 +23,13 @@ import type { LookupListQuery, LookupStatus } from '@stockflow/types';
 import { ErrorState } from '@/components/errors';
 import { ConfirmDialog } from '@/components/confirm-dialog';
 import { errorMessage } from '@/lib/api';
-import type { LookupDescriptor } from '../descriptors';
-import type { LookupRecord } from '../types';
-import { useLookupList } from '../queries';
-import { useArchiveLookup, useDeleteLookup, useRestoreLookup } from '../mutations';
-import { LookupStatusBadge } from './lookup-status-badge';
+import type { ResourceDescriptor } from '../descriptor';
+import type { ResourceRecord } from '../types';
+import { useResourceList } from '../queries';
+import { useArchiveResource, useDeleteResource, useRestoreResource } from '../mutations';
+import { ResourceStatusBadge } from './resource-status-badge';
 
-export interface LookupColumn<T> {
+export interface ResourceColumn<T> {
   header: string;
   align?: 'right';
   cell: (row: T) => ReactNode;
@@ -41,10 +41,12 @@ interface FormDialogProps<T> {
   onOpenChange: (open: boolean) => void;
 }
 
-export interface LookupManagerProps<T extends LookupRecord> {
-  descriptor: LookupDescriptor<T>;
+export interface ResourceManagerProps<T extends ResourceRecord> {
+  descriptor: ResourceDescriptor<T>;
+  /** Optional one-line subtitle under the heading. */
+  subtitle?: string;
   /** Extra columns shown between Name and Status. */
-  columns: LookupColumn<T>[];
+  columns: ResourceColumn<T>[];
   /** The resource's concrete create/edit dialog. */
   renderFormDialog: (props: FormDialogProps<T>) => ReactNode;
 }
@@ -60,15 +62,17 @@ function formatDate(iso: string): string {
 }
 
 /**
- * The generic lookup admin — list, search + status filter, pagination, and lifecycle actions (edit,
- * archive/restore, delete) for any resource described by a {@link LookupDescriptor}. The resource only
- * supplies its extra columns and its concrete form dialog; everything else is shared.
+ * The generic resource admin — list, search + status filter, pagination, and lifecycle actions (edit,
+ * archive/restore, delete) for any resource described by a {@link ResourceDescriptor}. The resource only
+ * supplies its extra columns and its concrete form dialog; everything else is shared (used by Catalog
+ * lookups, Parties, and future CRUD modules).
  */
-export function LookupManager<T extends LookupRecord>({
+export function ResourceManager<T extends ResourceRecord>({
   descriptor,
+  subtitle,
   columns,
   renderFormDialog,
-}: LookupManagerProps<T>) {
+}: ResourceManagerProps<T>) {
   const [page, setPage] = useState(1);
   const [q, setQ] = useState('');
   const [status, setStatus] = useState<LookupStatus | undefined>(undefined);
@@ -85,10 +89,10 @@ export function LookupManager<T extends LookupRecord>({
     ...(status ? { status } : {}),
     ...(q ? { q } : {}),
   };
-  const { data, isLoading, isError, error, refetch } = useLookupList(descriptor, query);
-  const archive = useArchiveLookup(descriptor);
-  const restore = useRestoreLookup(descriptor);
-  const remove = useDeleteLookup(descriptor);
+  const { data, isLoading, isError, error, refetch } = useResourceList(descriptor, query);
+  const archive = useArchiveResource(descriptor);
+  const restore = useRestoreResource(descriptor);
+  const remove = useDeleteResource(descriptor);
 
   const rows = data?.data ?? [];
   const meta = data?.meta.page;
@@ -129,9 +133,7 @@ export function LookupManager<T extends LookupRecord>({
       <header className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <h1 className="text-2xl font-semibold tracking-tight text-foreground">{descriptor.plural}</h1>
-          <p className="text-sm text-muted-foreground">
-            Reference data used to classify and measure products.
-          </p>
+          {subtitle ? <p className="text-sm text-muted-foreground">{subtitle}</p> : null}
         </div>
         <Button leadingIcon={AddIcon} onClick={openCreate}>
           New {descriptor.singular.toLowerCase()}
@@ -219,7 +221,7 @@ export function LookupManager<T extends LookupRecord>({
                         </TableCell>
                       ))}
                       <TableCell>
-                        <LookupStatusBadge status={row.status} />
+                        <ResourceStatusBadge status={row.status} />
                       </TableCell>
                       <TableCell className="text-muted-foreground">{formatDate(row.updatedAt)}</TableCell>
                       <TableCell className="text-right">
@@ -234,19 +236,11 @@ export function LookupManager<T extends LookupRecord>({
                             Edit
                           </Button>
                           {row.status === 'archived' ? (
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={() => setConfirm({ kind: 'restore', row })}
-                            >
+                            <Button variant="ghost" size="sm" onClick={() => setConfirm({ kind: 'restore', row })}>
                               Restore
                             </Button>
                           ) : (
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={() => setConfirm({ kind: 'archive', row })}
-                            >
+                            <Button variant="ghost" size="sm" onClick={() => setConfirm({ kind: 'archive', row })}>
                               Archive
                             </Button>
                           )}
@@ -271,7 +265,8 @@ export function LookupManager<T extends LookupRecord>({
           {meta && meta.total > 0 ? (
             <div className="flex flex-wrap items-center justify-between gap-3">
               <p className="text-sm text-muted-foreground" aria-live="polite">
-                {meta.total} {meta.total === 1 ? descriptor.singular.toLowerCase() : descriptor.plural.toLowerCase()}
+                {meta.total}{' '}
+                {meta.total === 1 ? descriptor.singular.toLowerCase() : descriptor.plural.toLowerCase()}
               </p>
               {meta.totalPages > 1 ? (
                 <Pagination page={meta.page} pageCount={meta.totalPages} onPageChange={setPage} size="sm" />
@@ -305,7 +300,7 @@ export function LookupManager<T extends LookupRecord>({
         open={confirm?.kind === 'delete'}
         onOpenChange={(open) => !open && setConfirm(null)}
         title={`Delete this ${descriptor.singular.toLowerCase()}?`}
-        description="Soft-deletes it and frees the name for reuse. Products keep their reference until edited."
+        description="Soft-deletes it and frees the name/code for reuse. References keep their value until edited."
         confirmLabel="Delete"
         variant="destructive"
         loading={confirmPending}

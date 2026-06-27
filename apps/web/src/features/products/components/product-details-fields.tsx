@@ -7,7 +7,7 @@ import {
 } from 'react-hook-form';
 import { Field, FieldControl, Input, Textarea } from '@stockflow/ui';
 import { BRANDS, CATEGORIES, UNITS } from '@/features/lookups/descriptors';
-import { LookupSelect } from '@/features/lookups/components/lookup-select';
+import { ResourceSelect } from '@/features/resources/components/resource-select';
 
 type TextKey = 'name' | 'description';
 type RefKey = 'baseUnitId' | 'categoryId' | 'brandId';
@@ -65,7 +65,7 @@ export function ProductDetailsFields<T extends FieldValues>({
           control={control}
           name={'baseUnitId' as Path<T>}
           render={({ field }) => (
-            <LookupSelect
+            <ResourceSelect
               descriptor={UNITS}
               value={asString(field.value)}
               onChange={field.onChange}
@@ -80,7 +80,7 @@ export function ProductDetailsFields<T extends FieldValues>({
           control={control}
           name={'categoryId' as Path<T>}
           render={({ field }) => (
-            <LookupSelect
+            <ResourceSelect
               descriptor={CATEGORIES}
               value={asString(field.value)}
               onChange={field.onChange}
@@ -96,7 +96,7 @@ export function ProductDetailsFields<T extends FieldValues>({
           control={control}
           name={'brandId' as Path<T>}
           render={({ field }) => (
-            <LookupSelect
+            <ResourceSelect
               descriptor={BRANDS}
               value={asString(field.value)}
               onChange={field.onChange}

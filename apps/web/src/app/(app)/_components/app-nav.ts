@@ -4,12 +4,14 @@ import {
   CategoryIcon,
   DashboardIcon,
   LocationIcon,
+  MembersIcon,
   ProductIcon,
   ProductsIcon,
   PurchaseOrderIcon,
   ReportIcon,
   SalesOrderIcon,
   SettingsIcon,
+  SupplierIcon,
   UnitIcon,
 } from '@stockflow/icons';
 
@@ -48,6 +50,13 @@ export const APP_NAV: NavGroup[] = [
     items: [
       { label: 'Inventory', href: '/inventory', icon: ProductsIcon },
       { label: 'Locations', href: '/locations', icon: LocationIcon },
+    ],
+  },
+  {
+    title: 'Partners',
+    items: [
+      { label: 'Suppliers', href: '/suppliers', icon: SupplierIcon },
+      { label: 'Customers', href: '/customers', icon: MembersIcon },
     ],
   },
   {

@@ -7,8 +7,8 @@ import { Button, Field, FieldControl, Input, Modal, toast } from '@stockflow/ui'
 import type { BrandResponse } from '@stockflow/types';
 import { errorMessage } from '@/lib/api';
 import { applyApiErrorToForm } from '@/lib/forms';
+import { useCreateResource, useUpdateResource } from '@/features/resources/mutations';
 import { BRANDS } from '../descriptors';
-import { useCreateLookup, useUpdateLookup } from '../mutations';
 import {
   brandFormSchema,
   brandToForm,
@@ -28,8 +28,8 @@ export interface BrandFormDialogProps {
 export function BrandFormDialog({ open, editing, onOpenChange }: BrandFormDialogProps) {
   const formId = useId();
   const isEdit = Boolean(editing);
-  const create = useCreateLookup(BRANDS);
-  const update = useUpdateLookup(BRANDS);
+  const create = useCreateResource(BRANDS);
+  const update = useUpdateResource(BRANDS);
 
   const form = useForm<BrandFormValues>({
     resolver: zodResolver(brandFormSchema),

@@ -1,7 +1,8 @@
 /**
- * Money in StockFlow is always stored as **integer minor units + currency** (never a float) — see
- * DATABASE/ARCHITECTURE. Forms, however, let people type a major-unit decimal ("12.50"). These helpers
- * convert at the form boundary, parsing manually (not via `* 100`) to avoid binary-float rounding.
+ * Money in StockFlow is always stored as **integer minor units + currency** (never a float). Forms,
+ * however, let people type a major-unit decimal ("12.50"). These helpers convert at the form boundary,
+ * parsing manually (not via `* 100`) to avoid binary-float rounding. Shared by every money field
+ * (product prices, customer credit limits, …).
  *
  * Assumption: a 2-decimal minor exponent (the dominant case). Zero/three-decimal currencies (JPY, BHD)
  * are a documented follow-up; the API remains the source of truth for the stored integer.
