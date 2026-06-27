@@ -1,18 +1,17 @@
 'use client';
 
 import { useState } from 'react';
+import { Button, CommandPalette, type CommandAction } from '@stockflow/ui';
 import {
   AddIcon,
-  Button,
-  CommandPalette,
   DashboardIcon,
   ProductsIcon,
   SearchIcon,
   SettingsIcon,
   TransferIcon,
   WarehouseIcon,
-  type CommandAction,
-} from '@stockflow/ui';
+  type LucideIcon,
+} from '@stockflow/icons';
 import { CodeBlock } from '../_ui/code-block';
 import { Block, Guidelines, PropsTable, Section, ShowcasePage, type PropRow } from '../_ui/showcase';
 
@@ -39,7 +38,7 @@ export default function CommandPaletteShowcase() {
   const [open, setOpen] = useState(false);
   const [lastRun, setLastRun] = useState<string | null>(null);
 
-  const make = (id: string, label: string, group: string, icon: CommandAction['icon'], shortcut?: string, keywords?: string[]): CommandAction => ({
+  const make = (id: string, label: string, group: string, icon: LucideIcon, shortcut?: string, keywords?: string[]): CommandAction => ({
     id,
     label,
     group,
