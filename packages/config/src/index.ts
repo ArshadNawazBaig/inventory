@@ -13,6 +13,13 @@ export const APP = {
  */
 export const EnvSchema = z.object({
   NODE_ENV: z.enum(['development', 'test', 'production']).default('development'),
+  // Cross-cutting runtime/observability config (consumed by the API; harmless to others).
+  LOG_LEVEL: z
+    .enum(['fatal', 'error', 'warn', 'info', 'debug', 'trace', 'silent'])
+    .default('info'),
+  API_PORT: z.coerce.number().int().positive().default(3001),
+  /** Comma-separated allow-list of browser origins for CORS (empty = same-origin only). */
+  CORS_ORIGINS: z.string().optional(),
   MONGODB_URI: z.string().url().optional(),
   REDIS_URL: z.string().url().optional(),
 });

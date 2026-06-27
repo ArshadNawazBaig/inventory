@@ -23,6 +23,25 @@ export const ERROR_CODES = [
 ] as const;
 export type ErrorCode = (typeof ERROR_CODES)[number];
 
+/** A single field-level validation problem. */
+export interface ErrorDetail {
+  field: string;
+  message: string;
+}
+
+/** The body of a StockFlow API error (stable, machine-readable). */
+export interface ApiErrorBody {
+  code: ErrorCode;
+  message: string;
+  details?: ErrorDetail[];
+  requestId: string;
+}
+
+/** The full error response envelope returned by every endpoint on failure. */
+export interface ApiErrorResponse {
+  error: ApiErrorBody;
+}
+
 /** Health check response contract (used by the API). */
 export const HealthResponseSchema = z.object({
   status: z.literal('ok'),
