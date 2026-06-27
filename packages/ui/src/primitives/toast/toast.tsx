@@ -43,7 +43,7 @@ export const ToastViewport = forwardRef<
     <ToastPrimitive.Viewport
       ref={ref}
       className={cn(
-        'fixed z-[100] m-0 flex max-h-screen w-full list-none flex-col gap-2 p-4 sm:max-w-[400px] sm:p-6',
+        'fixed z-100 m-0 flex max-h-screen w-full list-none flex-col gap-2 p-4 sm:max-w-[400px] sm:p-6',
         viewportPosition[position],
         className,
       )}
