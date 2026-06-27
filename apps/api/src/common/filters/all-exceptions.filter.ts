@@ -1,5 +1,6 @@
 import { type ArgumentsHost, Catch, type ExceptionFilter, HttpException } from '@nestjs/common';
 import type { Response } from 'express';
+import { ZodValidationException } from 'nestjs-zod';
 import { ZodError } from 'zod';
 import type { ApiErrorResponse, ErrorCode, ErrorDetail } from '@stockflow/types';
 import { DomainError } from '../errors';
@@ -76,6 +77,18 @@ export class AllExceptionsFilter implements ExceptionFilter {
         code: 'VALIDATION_ERROR',
         message: 'Validation failed.',
         details: exception.issues.map((issue) => ({
+          field: issue.path.join('.'),
+          message: issue.message,
+        })),
+      };
+    }
+
+    if (exception instanceof ZodValidationException) {
+      return {
+        status: 400,
+        code: 'VALIDATION_ERROR',
+        message: 'Validation failed.',
+        details: exception.getZodError().issues.map((issue) => ({
           field: issue.path.join('.'),
           message: issue.message,
         })),

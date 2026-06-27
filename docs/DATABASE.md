@@ -167,7 +167,7 @@ Seeded constant set (e.g. `product.create`, `stock.adjust`, `po.approve`, `audit
 | `attributes` | `object` | Tenant-defined custom attributes (schema-flexible). |
 | `imageFileIds` | `ObjectId[]` | → `files` (bounded gallery). |
 | `hasVariants` | `bool` | A product always has ≥1 variant (a "simple" product = one default variant). |
-| `status` | `enum<active, archived>` | Lifecycle (distinct from soft delete — see [§12.3](#123-archive-vs-delete)). |
+| `status` | `enum<draft, active, archived>` | Lifecycle (distinct from soft delete — see [§12.3](#123-archive-vs-delete)). `draft` = created/imported but not yet published. |
 
 ### 4.2 `variants` — the sellable / stockable unit
 | Field | Type | Notes |

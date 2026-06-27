@@ -1,4 +1,5 @@
 import 'reflect-metadata';
+import { VersioningType } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import type { NextFunction, Request, Response } from 'express';
@@ -20,6 +21,7 @@ async function bootstrap(): Promise<void> {
   );
 
   app.setGlobalPrefix('api');
+  app.enableVersioning({ type: VersioningType.URI }); // /api/v1/... ; unversioned routes stay neutral
   app.enableShutdownHooks();
 
   const { corsOrigins } = config;

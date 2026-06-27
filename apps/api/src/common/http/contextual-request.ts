@@ -9,4 +9,7 @@ import type { Logger } from 'pino';
 export interface ContextualRequest extends Request {
   requestId: string;
   log: Logger;
+  /** Tenant + actor set by the auth layer (dev guard today, Better Auth later). */
+  organizationId?: string;
+  userId?: string;
 }

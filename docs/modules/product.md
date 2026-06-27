@@ -3,7 +3,7 @@
 | Field | Value |
 |-------|-------|
 | **Document** | Product Module Design (Catalog bounded context) |
-| **Status** | 🔵 In review — authored, awaiting approval |
+| **Status** | 🟢 Backend implemented — [`apps/api/src/modules/catalog`](../../apps/api/src/modules/catalog) (27 tests · Swagger · validation) |
 | **Phase** | 6–7 — Module design (API + Backend), documentation-first |
 | **Depends on** | [ARCHITECTURE.md](../ARCHITECTURE.md) · [DATABASE.md](../DATABASE.md) · [AUTHENTICATION.md](../AUTHENTICATION.md) |
 | **Authoritative sources** | DATABASE §4 (catalog) · AUTHENTICATION §10 (permissions) · [`.claude/api/*`](../../.claude/api) · [`.claude/backend/*`](../../.claude/backend) |

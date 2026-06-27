@@ -33,7 +33,7 @@ Per-module design specs (entities · DTOs · validation · API · permissions ·
 
 | Module | Bounded context | Status |
 |--------|-----------------|--------|
-| [Product](./modules/product.md) | Catalog | 🔵 In review |
+| [Product](./modules/product.md) | Catalog | 🟢 Backend implemented (in-memory adapter · 27 tests · Swagger) |
 
 ## Component specs
 

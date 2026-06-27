@@ -49,3 +49,6 @@ export const HealthResponseSchema = z.object({
   time: z.string(),
 });
 export type HealthResponse = z.infer<typeof HealthResponseSchema>;
+
+// Catalog (Product module) contracts.
+export * from './catalog';

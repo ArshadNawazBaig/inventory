@@ -34,6 +34,40 @@ dependency — is recorded here with context, decision, and consequences.
 ### ADR-006 — Async-by-default heavy work via BullMQ
 ### ADR-007 — API-first; web is the first client
 
+## Implementation decisions
+
+### ADR-008 — `nestjs-zod` for the Zod ↔ Swagger bridge (API)
+- Status: Accepted · Context: DTOs/contracts are Zod schemas in `packages/types`; Swagger must be
+  generated from them without a duplicate set of class DTOs (DRY golden rule).
+- Decision: add `nestjs-zod`. Use `createZodDto` for request/query DTO classes (validated by the
+  global `ZodValidationPipe`) and `zodToOpenAPI` to emit OpenAPI schemas in `@ApiBody`/`@ApiResponse`.
+- Consequences: one source of truth for validation + types + docs. **Do not call `patchNestJsSwagger()`**
+  — it deep-imports a `@nestjs/swagger@11` internal that is no longer exported (crashes at boot);
+  `zodToOpenAPI` is used instead. Validation errors are mapped to the standard envelope in the global filter.
+
+### ADR-009 — `vitest` as the API test runner
+- Status: Accepted · Context: the monorepo already standardizes on Vitest (`packages/ui`); NestJS
+  services are plain classes testable without the Nest runtime.
+- Decision: `vitest` (node environment) for `apps/api`; services unit-tested against in-memory/fake ports.
+- Consequences: fast, framework-free tests; `*.test.ts` excluded from `nest build`.
+
+### ADR-010 — Ports-and-adapters with in-memory adapters until the DB module lands
+- Status: Accepted · Context: the database module (Mongoose connection + base tenant repository) and the
+  Inventory module are deferred; the Product module must still ship runnable + tested.
+- Decision: application depends on repository/query **ports**; bind them to in-memory repositories and
+  stub Inventory/reference adapters now. The Mongoose adapters implement the same ports and drop in later
+  with zero application-layer change (dependency inversion).
+- Consequences: data is non-persistent until the DB module; the transaction boundary documented in
+  product.md attaches with the Mongoose session. Bulk import (needs BullMQ) and RBAC enforcement (needs
+  the auth module) are encoded as seams (`@RequirePermission`, `InventoryQueryPort`) but not yet wired.
+
+### ADR-011 — Temporary dev tenant guard (replaced by Better Auth)
+- Status: Accepted (temporary) · Context: no auth module yet, but the API must be runnable locally.
+- Decision: `DevAuthGuard` reads `x-organization-id`/`x-user-id` **in non-production only**; in production
+  it is a no-op, so tenant-scoped endpoints fail closed (401) until the real AuthGuard lands. The tenant is
+  never read from the request body (tenant-isolation.md).
+- Consequences: local runnability without weakening production; removed when Better Auth provides AuthContext.
+
 ## Open decisions (need ratification)
 - Package manager/task runner (pnpm + Turborepo proposed).
 - Inventory valuation method default (weighted-average proposed).
