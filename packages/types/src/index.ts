@@ -82,3 +82,6 @@ export * from './audit';
 
 // Notifications (per-recipient in-app inbox) contracts.
 export * from './notifications';
+
+// Reports (read-only cross-module analytics) contracts.
+export * from './reports';

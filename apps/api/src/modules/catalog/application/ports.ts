@@ -32,6 +32,8 @@ export interface VariantRepository {
   findById(organizationId: string, id: string): Promise<VariantEntity | null>;
   findByProduct(organizationId: string, productId: string): Promise<VariantEntity[]>;
   findLiveBySku(organizationId: string, sku: string): Promise<VariantEntity | null>;
+  /** Every live variant for the tenant — the basis for catalog-wide reports (e.g. low-stock/reorder). */
+  listAll(organizationId: string): Promise<VariantEntity[]>;
   update(
     organizationId: string,
     id: string,

@@ -14,6 +14,15 @@ export interface VariantSnapshot {
   currency: string | null;
 }
 
+/** A reorder-eligible variant (reorderPoint > 0) joined with its product name — for the low-stock report. */
+export interface ReorderVariant {
+  variantId: string;
+  sku: string;
+  productName: string;
+  reorderPoint: number;
+  reorderQty: number;
+}
+
 /**
  * The public, read-only query surface other modules use to validate + snapshot catalog references. Inventory
  * binds its reference port to `variantExists`; Purchasing/Sales snapshot order lines via `getVariantSnapshot`
@@ -42,5 +51,29 @@ export class CatalogQuery {
       defaultPriceMinor: variant.defaultPriceMinor,
       currency: variant.currency,
     };
+  }
+
+  /** Live variants with a positive reorder point, joined with their product name (low-stock report source). */
+  async listReorderVariants(organizationId: string): Promise<ReorderVariant[]> {
+    const variants = await this.variants.listAll(organizationId);
+    const productNames = new Map<string, string>();
+    const rows: ReorderVariant[] = [];
+    for (const variant of variants) {
+      if (variant.reorderPoint <= 0) continue;
+      let productName = productNames.get(variant.productId);
+      if (productName === undefined) {
+        const product = await this.products.findById(organizationId, variant.productId);
+        productName = product?.name ?? '';
+        productNames.set(variant.productId, productName);
+      }
+      rows.push({
+        variantId: variant.id,
+        sku: variant.sku,
+        productName,
+        reorderPoint: variant.reorderPoint,
+        reorderQty: variant.reorderQty,
+      });
+    }
+    return rows;
   }
 }

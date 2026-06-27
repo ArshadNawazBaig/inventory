@@ -107,6 +107,13 @@ export class InMemoryStockLevelRepository implements StockLevelRepository {
     return Promise.resolve(items);
   }
 
+  listAll(organizationId: string): Promise<StockLevelEntity[]> {
+    const items = [...this.store.values()]
+      .filter((l) => l.organizationId === organizationId)
+      .map((l) => ({ ...l }));
+    return Promise.resolve(items);
+  }
+
   private comparator(sort: StockLevelListQuery['sort']): (a: StockLevelEntity, b: StockLevelEntity) => number {
     const descending = sort.startsWith('-');
     const field = (descending ? sort.slice(1) : sort) as 'onHand' | 'available' | 'updatedAt';

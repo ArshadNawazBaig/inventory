@@ -298,6 +298,23 @@ dependency — is recorded here with context, decision, and consequences.
   **realtime** (Socket.IO) delivery via the worker/queue, low-stock alerts from the inventory event stream, user
   preferences, Mongoose adapter. Permission key `notification.view` to sync into AUTHENTICATION §10.
 
+### ADR-026 — Reports: synchronous, read-only cross-module aggregation; catalog-driven low-stock
+- Status: Accepted · Context: Wave 7. CLAUDE.md frames reports as async/exportable, but the worker/queue aren't
+  wired and the data volumes (in-memory) are small.
+- Decision: a **Reports module** that owns no collection and computes two reports **synchronously** by
+  aggregating existing read-models — **inventory valuation** (each (variant × location) cell valued at its
+  weighted-average cost; totals + by-warehouse breakdown) and **low stock / reorder** (variants at/below their
+  reorder point). It depends one-way on Inventory/Catalog/Locations via read ports bound by identity to their
+  query services (no writes, no cycles); the service returns response shapes directly (no domain entity). The
+  low-stock report is **catalog-driven, not levels-driven** so it includes **out-of-stock** variants (no stock
+  row) — the most urgent reorders; this added `CatalogQuery.listReorderVariants` + `VariantRepository.listAll`,
+  `InventoryQuery.listAllLevels` + `StockLevelRepository.listAll`, and `LocationQuery.getWarehouseLabel`.
+- Consequences: correct + shippable on the in-memory adapters; uniform read access without new infra. Rejected:
+  building the BullMQ pipeline before the worker exists; a levels-driven low-stock scan (would miss out-of-stock
+  items). Follow-ups: async generation + **CSV export** (`report.export`) via BullMQ; more reports (movement
+  summary, inventory aging, dead stock, PO/SO summaries); multi-currency valuation; caching/materialized
+  read-models at scale. Permission keys `report.{view,export}` to sync into AUTHENTICATION §10.
+
 ## Open decisions (need ratification)
 - Package manager/task runner (pnpm + Turborepo proposed).
 - Inventory valuation method default (weighted-average proposed).

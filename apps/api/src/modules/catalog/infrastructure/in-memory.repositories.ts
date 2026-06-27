@@ -113,6 +113,13 @@ export class InMemoryVariantRepository implements VariantRepository {
     return Promise.resolve(items.map((v) => ({ ...v })));
   }
 
+  listAll(organizationId: string): Promise<VariantEntity[]> {
+    const items = [...this.store.values()].filter(
+      (v) => v.organizationId === organizationId && v.deletedAt === null,
+    );
+    return Promise.resolve(items.map((v) => ({ ...v })));
+  }
+
   findLiveBySku(organizationId: string, sku: string): Promise<VariantEntity | null> {
     const found = [...this.store.values()].find(
       (v) => v.organizationId === organizationId && v.sku === sku && v.deletedAt === null,

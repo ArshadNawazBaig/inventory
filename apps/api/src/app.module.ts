@@ -19,6 +19,7 @@ import { InventoryModule } from './modules/inventory/inventory.module';
 import { LocationsModule } from './modules/locations/locations.module';
 import { PartiesModule } from './modules/parties/parties.module';
 import { PurchasingModule } from './modules/purchasing/purchasing.module';
+import { ReportsModule } from './modules/reports/reports.module';
 import { ReturnsModule } from './modules/returns/returns.module';
 import { SalesModule } from './modules/sales/sales.module';
 import { TransfersModule } from './modules/transfers/transfers.module';
@@ -42,6 +43,7 @@ import { TransfersModule } from './modules/transfers/transfers.module';
     ReturnsModule,
     AuditModule,
     NotificationsModule,
+    ReportsModule,
   ],
   controllers: [HealthController],
   providers: [

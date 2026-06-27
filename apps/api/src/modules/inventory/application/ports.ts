@@ -32,6 +32,8 @@ export interface StockLevelRepository {
     query: StockLevelListQuery,
   ): Promise<{ items: StockLevelEntity[]; total: number }>;
   listByVariant(organizationId: string, variantId: string): Promise<StockLevelEntity[]>;
+  /** Every projection row for the tenant — the basis for cross-cutting reports (valuation, low-stock). */
+  listAll(organizationId: string): Promise<StockLevelEntity[]>;
 }
 
 /** Existence checks for the references a movement points at (bound to Catalog + Locations queries). */

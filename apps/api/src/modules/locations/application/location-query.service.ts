@@ -37,4 +37,10 @@ export class LocationQuery {
     const location = await this.locations.findById(organizationId, locationId);
     return location?.name ?? null;
   }
+
+  /** A human-readable label for a warehouse (used to group reports by site). */
+  async getWarehouseLabel(organizationId: string, warehouseId: string): Promise<string | null> {
+    const warehouse = await this.warehouses.findById(organizationId, warehouseId);
+    return warehouse?.name ?? null;
+  }
 }

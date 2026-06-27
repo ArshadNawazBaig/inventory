@@ -44,6 +44,7 @@ Per-module design specs (entities · DTOs · validation · API · permissions ·
 | [Returns](./modules/returns.md) | Procurement & Sales | 🟢 Backend implemented (`kind`-discriminated · complete posts `return_in` (customer) / `return_out` (supplier, negative-guarded) · per-tenant RET sequence · 13 tests) · 🟢 Frontend implemented (list · create w/ kind-driven party · detail + complete · 2 tests) |
 | [Audit](./modules/audit.md) | Cross-cutting | 🟢 Backend implemented (immutable append-only trail · global interceptor records every successful mutation · route→action deriver · read API w/ filters · 18 tests) · 🟢 Frontend implemented (filterable viewer + detail modal · 4 tests) |
 | [Notifications](./modules/notifications.md) | Cross-cutting | 🟢 Backend implemented (per-recipient inbox · curated interceptor (reuses audit deriver) notifies on noteworthy transitions · list/unread-count/mark-read/mark-all · 13 tests) · 🟢 Frontend implemented (navbar bell w/ unread badge + popover · page w/ filters · 3 tests) |
+| [Reports](./modules/reports.md) | Analytics | 🟢 Backend implemented (read-only cross-module aggregations · inventory valuation @ weighted-avg cost w/ by-warehouse breakdown · catalog-driven low-stock incl. out-of-stock · 11 tests) · 🟢 Frontend implemented (valuation KPIs + Recharts bar chart + tables · low-stock reorder table · tabs · 2 tests) |
 
 ## Component specs
 

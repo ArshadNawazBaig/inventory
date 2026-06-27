@@ -2,6 +2,15 @@ import { Inject, Injectable } from '@nestjs/common';
 import type { VariantStockSummary } from '../domain/entities';
 import { STOCK_LEVEL_REPOSITORY, type StockLevelRepository } from './ports';
 
+/** A flattened (variant × location) projection row — the stable read shape reports aggregate over. */
+export interface StockLevelView {
+  variantId: string;
+  locationId: string;
+  onHand: number;
+  avgCostMinor: number | null;
+  currency: string | null;
+}
+
 /**
  * The public, read-only window into inventory other modules consume — the read-model that satisfies the
  * Catalog variant-delete guard's `getVariantStockSummary` shape. Aggregates the (variant × location)
@@ -28,5 +37,17 @@ export class InventoryQuery {
       }),
       { onHand: 0, reserved: 0, inTransit: 0, hasOpenOrders: false },
     );
+  }
+
+  /** Every (variant × location) projection row for the tenant — consumed by the Reports module. */
+  async listAllLevels(organizationId: string): Promise<StockLevelView[]> {
+    const cells = await this.levels.listAll(organizationId);
+    return cells.map((cell) => ({
+      variantId: cell.variantId,
+      locationId: cell.locationId,
+      onHand: cell.onHand,
+      avgCostMinor: cell.avgCostMinor,
+      currency: cell.currency,
+    }));
   }
 }
