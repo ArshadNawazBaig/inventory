@@ -13,6 +13,7 @@ import {
   SettingsIcon,
   SupplierIcon,
   UnitIcon,
+  WarehouseIcon,
 } from '@stockflow/icons';
 
 export interface NavItem {
@@ -49,6 +50,7 @@ export const APP_NAV: NavGroup[] = [
     title: 'Inventory',
     items: [
       { label: 'Inventory', href: '/inventory', icon: ProductsIcon },
+      { label: 'Warehouses', href: '/warehouses', icon: WarehouseIcon },
       { label: 'Locations', href: '/locations', icon: LocationIcon },
     ],
   },

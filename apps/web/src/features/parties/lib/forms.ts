@@ -1,6 +1,5 @@
 import { z } from 'zod';
 import type {
-  Address,
   AddressInput,
   CreateCustomerRequest,
   CreateSupplierRequest,
@@ -10,6 +9,13 @@ import type {
   UpdateSupplierRequest,
 } from '@stockflow/types';
 import { formatMinorToMajor, parseMajorToMinor } from '@/lib/money';
+import {
+  addressFormSchema,
+  addressToForm,
+  addressToInput,
+  emptyAddressForm,
+  type AddressFormValues,
+} from '@/lib/address-form';
 
 /**
  * Form-shaped schemas + request mappers for the party modules. As elsewhere, the wire contract lives in
@@ -43,24 +49,6 @@ const optionalMoney = z
   .trim()
   .refine((v) => v === '' || /^\d+(\.\d{1,2})?$/.test(v), 'Enter a valid amount (e.g. 1000.00)');
 
-export const addressFormSchema = z.object({
-  line1: trimmedString(200),
-  line2: trimmedString(200),
-  city: trimmedString(120),
-  region: trimmedString(120),
-  postalCode: trimmedString(32),
-  country: z.string().trim().refine((v) => v === '' || /^[A-Za-z]{2}$/.test(v), '2-letter country code'),
-});
-export type AddressFormValues = z.infer<typeof addressFormSchema>;
-const emptyAddressForm: AddressFormValues = {
-  line1: '',
-  line2: '',
-  city: '',
-  region: '',
-  postalCode: '',
-  country: '',
-};
-
 const partyShape = {
   name: z.string().trim().min(1, 'Name is required').max(160, 'Name is too long'),
   code: optionalCode,
@@ -74,30 +62,6 @@ const partyShape = {
 
 function trimmed(value: string): string {
   return value.trim();
-}
-
-/** Address form → request input (omit entirely when blank). */
-function addressToInput(address: AddressFormValues): AddressInput | undefined {
-  const input: AddressInput = {};
-  if (trimmed(address.line1)) input.line1 = trimmed(address.line1);
-  if (trimmed(address.line2)) input.line2 = trimmed(address.line2);
-  if (trimmed(address.city)) input.city = trimmed(address.city);
-  if (trimmed(address.region)) input.region = trimmed(address.region);
-  if (trimmed(address.postalCode)) input.postalCode = trimmed(address.postalCode);
-  if (trimmed(address.country)) input.country = trimmed(address.country).toUpperCase();
-  return Object.keys(input).length > 0 ? input : undefined;
-}
-
-function addressToForm(address: Address | null): AddressFormValues {
-  if (!address) return { ...emptyAddressForm };
-  return {
-    line1: address.line1 ?? '',
-    line2: address.line2 ?? '',
-    city: address.city ?? '',
-    region: address.region ?? '',
-    postalCode: address.postalCode ?? '',
-    country: address.country ?? '',
-  };
 }
 
 /** Apply the shared party contact fields onto a create request (blank = unset). */

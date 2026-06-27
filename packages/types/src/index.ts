@@ -58,3 +58,6 @@ export * from './catalog-lookups';
 
 // Parties (Suppliers · Customers) contracts.
 export * from './parties';
+
+// Locations (Warehouses · Locations) contracts.
+export * from './locations';

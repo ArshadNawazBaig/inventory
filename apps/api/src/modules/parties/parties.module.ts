@@ -1,8 +1,11 @@
 import { Module } from '@nestjs/common';
-import type {
-  ResourceClock,
-  ResourceEventPublisher,
-  ResourceIdGenerator,
+import {
+  LoggingResourceEventPublisher,
+  ObjectIdGenerator,
+  SystemClock,
+  type ResourceClock,
+  type ResourceEventPublisher,
+  type ResourceIdGenerator,
 } from '../../common/resource';
 import {
   CUSTOMER_REPOSITORY,
@@ -18,11 +21,6 @@ import {
   InMemoryCustomerRepository,
   InMemorySupplierRepository,
 } from './infrastructure/in-memory.repositories';
-import {
-  LoggingPartyEventPublisher,
-  ObjectIdGenerator,
-  SystemClock,
-} from './infrastructure/adapters';
 import { CustomerController, SupplierController } from './presentation/parties.controllers';
 
 /**
@@ -35,9 +33,12 @@ import { CustomerController, SupplierController } from './presentation/parties.c
   providers: [
     { provide: SUPPLIER_REPOSITORY, useClass: InMemorySupplierRepository },
     { provide: CUSTOMER_REPOSITORY, useClass: InMemoryCustomerRepository },
-    { provide: PARTY_ID_GENERATOR, useClass: ObjectIdGenerator },
-    { provide: PARTY_CLOCK, useClass: SystemClock },
-    { provide: PARTY_EVENT_PUBLISHER, useClass: LoggingPartyEventPublisher },
+    { provide: PARTY_ID_GENERATOR, useValue: new ObjectIdGenerator() },
+    { provide: PARTY_CLOCK, useValue: new SystemClock() },
+    {
+      provide: PARTY_EVENT_PUBLISHER,
+      useValue: new LoggingResourceEventPublisher('parties:event'),
+    },
     {
       provide: SupplierService,
       inject: [SUPPLIER_REPOSITORY, PARTY_ID_GENERATOR, PARTY_CLOCK, PARTY_EVENT_PUBLISHER],

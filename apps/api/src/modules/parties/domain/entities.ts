@@ -1,15 +1,8 @@
 import type { CustomerType } from '@stockflow/types';
+import type { Address } from '../../../common/address';
 import type { ResourceEntity } from '../../../common/resource';
 
-/** Embedded postal address (every sub-field optional). */
-export interface Address {
-  line1: string | null;
-  line2: string | null;
-  city: string | null;
-  region: string | null;
-  postalCode: string | null;
-  country: string | null;
-}
+export type { Address };
 
 /** Shared contact envelope for an external business party. Framework-free. */
 export interface PartyEntity extends ResourceEntity {

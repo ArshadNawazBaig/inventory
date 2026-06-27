@@ -146,6 +146,28 @@ dependency — is recorded here with context, decision, and consequences.
   actions currently return 201 (Nest default) where docs say 200 — harmless (2xx); a `@HttpCode(200)`
   standardization across product/lookups/parties is a small follow-up.
 
+### ADR-018 — Locations (Warehouses · Locations) — base for warehouses, bespoke for the tree
+- Status: Accepted · Context: Wave 3. Stock is tracked at a `locationId`; the physical network is a
+  Warehouse → Zone → … → Bin tree (DATABASE §5, ADR-004). Inventory/Transfers/PO/SO will reference it.
+- Decision: one `locations` module with two entities. **Warehouse** rides the shared `common/resource` base
+  (like a party: optional unique `code`, embedded `address`) plus a `findDefault` lookup enforcing an
+  at-most-one-`isDefault`-per-tenant invariant. **Location** is **bespoke** — codes are unique *within a
+  warehouse* (not tenant-wide), names are not unique, and the node carries a materialized `path` (slash-joined
+  ancestor codes). It composes the same primitives (id/clock/events, generic not-found/duplicate errors) but
+  does not inherit the name-keyed base. Parent validation enforces same-warehouse + acyclic; changing a
+  code/parent re-materializes descendants' paths; delete is refused while a node has live children (409).
+  The module exports `LocationQuery` (warehouse/location existence) for Inventory.
+- Consequences: a clean fit where the base fits and an honest bespoke service where it doesn't (composition
+  over a leaky abstraction). **Two DRY promotions this wave:** (a) the identical `ObjectIdGenerator` /
+  `SystemClock` and a parameterised `LoggingResourceEventPublisher(channel)` moved into `common/resource`
+  (catalog-lookups + parties refactored onto them, bound via `useValue`); (b) the embedded `Address` +
+  `buildAddress` moved to `common/address`, and the web address form (`@/lib/address-form` +
+  `@/components/address-fields`) promoted out of parties — both now shared by warehouses. New archive/restore
+  POST actions return **200** via `@HttpCode(200)`, setting the standard (product/lookups/parties
+  back-fill remains a small follow-up). Four permission keys (`{warehouse,location}.{view,manage}`) to sync
+  into AUTHENTICATION §10. Deferred: stock-in-location delete guard (needs Inventory), default
+  auto-promotion on delete, Mongoose adapters + materialized-path indexes, location-tree bulk import.
+
 ## Open decisions (need ratification)
 - Package manager/task runner (pnpm + Turborepo proposed).
 - Inventory valuation method default (weighted-average proposed).

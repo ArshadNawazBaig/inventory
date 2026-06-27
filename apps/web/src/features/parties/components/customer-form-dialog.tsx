@@ -29,8 +29,8 @@ import {
   toUpdateCustomer,
   type CustomerFormValues,
 } from '../lib/forms';
+import { AddressFields } from '@/components/address-fields';
 import { PartyContactFields } from './party-contact-fields';
-import { AddressFields } from './address-fields';
 
 export interface CustomerFormDialogProps {
   open: boolean;

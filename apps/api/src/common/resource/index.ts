@@ -7,5 +7,10 @@ export {
 } from './resource.ports';
 export { ResourceService, type ListResult } from './resource.service';
 export { InMemoryResourceRepository } from './in-memory.resource.repository';
+export {
+  ObjectIdGenerator,
+  SystemClock,
+  LoggingResourceEventPublisher,
+} from './adapters';
 export { ResourceNotFoundError, DuplicateResourceError } from './resource.errors';
 export { normalizeName, nameKey } from './name';

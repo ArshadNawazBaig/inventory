@@ -1,8 +1,11 @@
 import { Module } from '@nestjs/common';
-import type {
-  ResourceClock,
-  ResourceEventPublisher,
-  ResourceIdGenerator,
+import {
+  LoggingResourceEventPublisher,
+  ObjectIdGenerator,
+  SystemClock,
+  type ResourceClock,
+  type ResourceEventPublisher,
+  type ResourceIdGenerator,
 } from '../../common/resource';
 import {
   BRAND_REPOSITORY,
@@ -23,11 +26,6 @@ import {
   InMemoryUnitRepository,
 } from './infrastructure/in-memory.repositories';
 import {
-  LoggingLookupEventPublisher,
-  ObjectIdGenerator,
-  SystemClock,
-} from './infrastructure/adapters';
-import {
   BrandController,
   CategoryController,
   UnitController,
@@ -44,9 +42,12 @@ import {
     { provide: CATEGORY_REPOSITORY, useClass: InMemoryCategoryRepository },
     { provide: BRAND_REPOSITORY, useClass: InMemoryBrandRepository },
     { provide: UNIT_REPOSITORY, useClass: InMemoryUnitRepository },
-    { provide: LOOKUP_ID_GENERATOR, useClass: ObjectIdGenerator },
-    { provide: LOOKUP_CLOCK, useClass: SystemClock },
-    { provide: LOOKUP_EVENT_PUBLISHER, useClass: LoggingLookupEventPublisher },
+    { provide: LOOKUP_ID_GENERATOR, useValue: new ObjectIdGenerator() },
+    { provide: LOOKUP_CLOCK, useValue: new SystemClock() },
+    {
+      provide: LOOKUP_EVENT_PUBLISHER,
+      useValue: new LoggingResourceEventPublisher('catalog-lookups:event'),
+    },
     {
       provide: CategoryService,
       inject: [CATEGORY_REPOSITORY, LOOKUP_ID_GENERATOR, LOOKUP_CLOCK, LOOKUP_EVENT_PUBLISHER],

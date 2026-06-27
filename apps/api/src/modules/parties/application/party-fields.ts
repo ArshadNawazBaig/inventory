@@ -1,19 +1,5 @@
 import type { AddressInput } from '@stockflow/types';
-import type { Address } from '../domain/entities';
-
-/** Normalise an address input → domain Address; returns null when absent or entirely empty. */
-export function buildAddress(input: AddressInput | null | undefined): Address | null {
-  if (!input) return null;
-  const address: Address = {
-    line1: input.line1 ?? null,
-    line2: input.line2 ?? null,
-    city: input.city ?? null,
-    region: input.region ?? null,
-    postalCode: input.postalCode ?? null,
-    country: input.country ? input.country.toUpperCase() : null,
-  };
-  return Object.values(address).some((value) => value !== null) ? address : null;
-}
+import { buildAddress } from '../../../common/address';
 
 /** The shared party contact fields accepted on create (each optional). */
 export interface PartyCreateBase {
