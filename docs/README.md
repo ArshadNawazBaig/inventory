@@ -66,6 +66,7 @@ is the first and doubles as the spec template.
 | [Skeleton](./components/skeleton.md) | ✅ Implemented (Skeleton · SkeletonText · 7 tests + stories) |
 | [Search](./components/search.md) | ✅ Implemented (debounced · composes Input · 7 tests + stories) |
 | [Filters](./components/filters.md) | ✅ Implemented (filter bar · chips + editors · 7 tests + stories) |
+| [Command Palette](./components/command-palette.md) | ✅ Implemented (cmdk + Dialog · ⌘K · 7 tests + stories) |
 
 **Component build order (specs in strict list order, delivered in batches):**
 

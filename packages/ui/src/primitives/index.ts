@@ -32,3 +32,4 @@ export * from './loading';
 export * from './skeleton';
 export * from './search';
 export * from './filters';
+export * from './command-palette';
