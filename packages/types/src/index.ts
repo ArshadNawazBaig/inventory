@@ -76,3 +76,6 @@ export * from './transfers';
 
 // Returns (customer + supplier returns) contracts.
 export * from './returns';
+
+// Audit logs (immutable who-did-what trail) contracts.
+export * from './audit';

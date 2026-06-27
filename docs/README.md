@@ -42,6 +42,7 @@ Per-module design specs (entities · DTOs · validation · API · permissions ·
 | [Sales](./modules/sales.md) | Sales | 🟢 Backend implemented (SO lifecycle · fulfilling posts negative-guarded `shipment` movements · per-tenant SO sequence · 11 tests) · 🟢 Frontend implemented (shared `OrderForm` · list · detail + fulfil dialog · 2 tests) |
 | [Transfers](./modules/transfers.md) | Inventory | 🟢 Backend implemented (two-leg moves · dispatch posts `transfer_out` capturing source cost · receive posts `transfer_in` at that cost · per-tenant TR sequence · 16 tests) · 🟢 Frontend implemented (list · create w/ source/dest pickers · detail + dispatch/receive dialogs · 2 tests) |
 | [Returns](./modules/returns.md) | Procurement & Sales | 🟢 Backend implemented (`kind`-discriminated · complete posts `return_in` (customer) / `return_out` (supplier, negative-guarded) · per-tenant RET sequence · 13 tests) · 🟢 Frontend implemented (list · create w/ kind-driven party · detail + complete · 2 tests) |
+| [Audit](./modules/audit.md) | Cross-cutting | 🟢 Backend implemented (immutable append-only trail · global interceptor records every successful mutation · route→action deriver · read API w/ filters · 18 tests) · 🟢 Frontend implemented (filterable viewer + detail modal · 4 tests) |
 
 ## Component specs
 

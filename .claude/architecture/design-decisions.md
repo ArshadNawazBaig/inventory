@@ -260,6 +260,26 @@ dependency — is recorded here with context, decision, and consequences.
   this wave — both are documented follow-ups (return at original cost; cap returned qty by shipped/received).
   Permission keys `return.{view,manage}` to sync into AUTHENTICATION §10.
 
+### ADR-024 — Audit logs via a global interceptor, not per-module events
+- Status: Accepted · Context: Wave 7. The audit trail must record who-did-what for **every** mutation
+  (database/audit-logs.md, security/audit.md), but the event landscape is fragmented — resource modules emit
+  `ResourceEvent`, catalog a bespoke `EventPublisher`, inventory `InventoryEvent`, and the **order modules emit
+  nothing**; none of the events carry the actor.
+- Decision: capture audit at a single **global `AuditInterceptor`** that records every successful mutating
+  request (`POST`/`PATCH`/`PUT`/`DELETE`). It runs after the guards (only authorized actions) on the success
+  path (close to the write; clients can't bypass it). `{ action, entityType, entityId }` is derived from the
+  route by a **pure, exhaustively-tested helper** (sub-action → past-tense verb, else HTTP method; id from
+  `:id`/created entity); actor + `{ ip, userAgent, requestId, method, path, statusCode }` come from the request.
+  Writes flow through a cross-cutting **`AUDIT_RECORDER`** port (in `common/audit`) that the `AuditModule` binds
+  to its `AuditService`. Recording is **best-effort** — failures are logged, never break the user's request.
+- Consequences: uniform coverage of **all** modules (incl. orders) with **zero per-module churn** and no new
+  inter-module deps — `AuditModule` depends on nothing; the interceptor is wired once in `app.module` → no
+  cycles. The trail is immutable/append-only; read-only API (`audit.view`), tenant-scoped (cross-tenant → 404).
+  Rejected: wiring each module's fragmented event publishers into audit; coarse HTTP-only logging. Follow-ups:
+  domain callers can use the same `AUDIT_RECORDER` for redacted `before`/`after` diffs; audit security-relevant
+  **denials** (403/tenant/rate-limit); async **export** (`audit.export`) via BullMQ; Mongoose adapter (immutable
+  collection + per-tenant retention). Permission keys `audit.{view,export}` to sync into AUTHENTICATION §10.
+
 ## Open decisions (need ratification)
 - Package manager/task runner (pnpm + Turborepo proposed).
 - Inventory valuation method default (weighted-average proposed).
