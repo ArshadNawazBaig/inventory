@@ -16,6 +16,7 @@ implemented before its documentation has been written and approved.
 | [ARCHITECTURE.md](./ARCHITECTURE.md) | 🔵 In review — authored, awaiting approval | 3 — Architecture |
 | [DATABASE.md](./DATABASE.md) | 🔵 In review — authored, awaiting approval | 5 — Database |
 | [API_SPEC.md](./API_SPEC.md) | ⚪ Not started | 6 — API |
+| [AUTHENTICATION.md](./AUTHENTICATION.md) | 🔵 In review — authored, awaiting approval | Cross-cutting (auth deep-dive) |
 | [SECURITY.md](./SECURITY.md) | ⚪ Not started | Cross-cutting |
 | [DESIGN_SYSTEM.md](./DESIGN_SYSTEM.md) | 🟡 Awaiting approval (tokens implemented in `packages/ui`) | 4 — Component Design |
 | [ICON_SYSTEM.md](./ICON_SYSTEM.md) | 🟡 Awaiting approval (implemented in `packages/icons`) | 4 — Component Design |
