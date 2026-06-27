@@ -25,4 +25,10 @@ export class LocationQuery {
   async locationExists(organizationId: string, id: string): Promise<boolean> {
     return Boolean(await this.locations.findById(organizationId, id));
   }
+
+  /** The warehouse a location belongs to (used to assert a receipt/shipment targets the order's site). */
+  async findWarehouseId(organizationId: string, locationId: string): Promise<string | null> {
+    const location = await this.locations.findById(organizationId, locationId);
+    return location?.warehouseId ?? null;
+  }
 }

@@ -17,6 +17,7 @@ import {
   type SupplierRepository,
 } from './application/ports';
 import { CustomerService, SupplierService } from './application/party.service';
+import { PartyQuery } from './application/party-query.service';
 import {
   InMemoryCustomerRepository,
   InMemorySupplierRepository,
@@ -59,6 +60,8 @@ import { CustomerController, SupplierController } from './presentation/parties.c
         events: ResourceEventPublisher,
       ): CustomerService => new CustomerService(repo, ids, clock, events),
     },
+    PartyQuery,
   ],
+  exports: [PartyQuery],
 })
 export class PartiesModule {}

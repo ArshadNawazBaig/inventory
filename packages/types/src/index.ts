@@ -64,3 +64,9 @@ export * from './locations';
 
 // Inventory (stock ledger · levels · adjustments) contracts.
 export * from './inventory';
+
+// Purchasing (Purchase Orders) contracts.
+export * from './purchasing';
+
+// Sales (Sales Orders) contracts.
+export * from './sales';

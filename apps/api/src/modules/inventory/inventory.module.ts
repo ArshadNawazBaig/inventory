@@ -80,6 +80,6 @@ import { InventoryController } from './presentation/inventory.controller';
     },
     InventoryQuery,
   ],
-  exports: [InventoryQuery],
+  exports: [InventoryQuery, InventoryService],
 })
 export class InventoryModule {}

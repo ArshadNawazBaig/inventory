@@ -192,6 +192,39 @@ dependency — is recorded here with context, decision, and consequences.
   shipments (Sales), PO-costed receipts (Purchasing), transfer `inTransit` legs, count approval, tenant
   `allowNegativeStock` (Settings), Mongoose adapters + reconciliation job, zero/three-decimal currencies.
 
+### ADR-020 — Purchasing & Sales: orders that move stock through Inventory
+- Status: Accepted · Context: Wave 5. POs bring stock in; SOs send stock out. Both must move stock only
+  through the one ledger writer (Inventory) and preserve historical accuracy on their lines.
+- Decision: two modules — `purchasing` (Purchase Orders) and `sales` (Sales Orders) — each a header +
+  **embedded lines that snapshot sku/name (+ price) at order time**, a per-tenant `PO-####`/`SO-####`
+  sequence, denormalized totals, and a status machine (PO: draft→submitted→partially_received→received,
+  +cancel; SO: draft→confirmed→partially_fulfilled→fulfilled, +cancel). **Receiving** posts `receipt`
+  movements (costed → weighted-average) and **fulfilling** posts `shipment` movements (negative-guarded),
+  both through a generalized `InventoryService.postMovement` exposed as `receive()`/`ship()` (Inventory
+  stays the single ledger writer). Receipts/shipments are **idempotent** on a deterministic
+  `opKey = {po|so}:{id}:{lineId}:{newQty}`. To enable this, Inventory now **exports `InventoryService`**;
+  Parties exports a new **`PartyQuery`** (supplier/customer exists + name); Catalog's `CatalogQuery` gained
+  **`getVariantSnapshot`**; Locations' `LocationQuery` gained **`findWarehouseId`**.
+- Consequences: orders never touch the ledger directly; the `onHand == Σ delta` invariant holds. Dependency
+  direction is one-way: Purchasing/Sales → {Catalog, Parties, Locations, Inventory} — no cycles. A receive
+  must target a location in the PO's warehouse (422); over-receive/over-fulfil → 409; insufficient stock at
+  ship surfaces from Inventory as 409 (no line advanced). Frontend extracts a shared `features/orders`
+  (`OrderForm` with a dynamic line editor + `OrderStatusBadge`) reused by both. Permission keys
+  `purchase_order.{view,manage}` + `sales_order.{view,manage}` to sync into AUTHENTICATION §10. Deferred:
+  PO approval/`closed`, edit-draft UI, landed cost/tax, supplier-price defaults, Mongoose adapters +
+  `counters`. **Transaction note:** movement + order-state writes are sequential in-memory (validated first);
+  Mongoose wraps them in a session (DATABASE §11).
+
+### ADR-021 — Sales-order ATP reservations deferred (ship-time guard only)
+- Status: Accepted · Context: DATABASE §8 models `reservations` that confirm-an-SO would create to reduce
+  `available`; the Inventory projection already carries `reserved`/`available`.
+- Decision: **do not** build reservations in Wave 5. SO `confirm` is a status lock only; overselling is
+  prevented by the immutable ledger + the negative-stock guard at `fulfill` (ship) time.
+- Consequences: correct and shippable now (physical stock can't go negative). `available` equals `onHand`
+  until this lands. **Follow-up:** add `reservations` (reserve on confirm at an allocated location, release
+  on ship/cancel/expire), wire `reserved`/`available` upkeep into `InventoryService`, and surface ATP — needs
+  an allocation decision (which location/bin), so it is its own iteration.
+
 ## Open decisions (need ratification)
 - Package manager/task runner (pnpm + Turborepo proposed).
 - Inventory valuation method default (weighted-average proposed).

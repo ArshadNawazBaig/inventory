@@ -14,6 +14,8 @@ import { CatalogModule } from './modules/catalog/catalog.module';
 import { InventoryModule } from './modules/inventory/inventory.module';
 import { LocationsModule } from './modules/locations/locations.module';
 import { PartiesModule } from './modules/parties/parties.module';
+import { PurchasingModule } from './modules/purchasing/purchasing.module';
+import { SalesModule } from './modules/sales/sales.module';
 
 /**
  * API root module. Wires the cross-cutting foundation (validated config, global
@@ -28,6 +30,8 @@ import { PartiesModule } from './modules/parties/parties.module';
     LocationsModule,
     InventoryModule,
     PartiesModule,
+    PurchasingModule,
+    SalesModule,
   ],
   controllers: [HealthController],
   providers: [

@@ -1,7 +1,9 @@
 import type {
   CreateAdjustmentRequest,
+  MovementReason,
   StockLevelListQuery,
   StockMovementListQuery,
+  StockMovementType,
 } from '@stockflow/types';
 import type { ActorContext } from '../../../common/auth/actor-context';
 import type { ListResult } from '../../../common/resource';
@@ -27,6 +29,41 @@ export interface AdjustmentResult {
   level: StockLevelEntity;
 }
 
+/** A generalized ledger write — the single primitive every movement (adjust/receipt/shipment/…) flows through. */
+export interface PostMovementCommand {
+  variantId: string;
+  locationId: string;
+  delta: number;
+  type: StockMovementType;
+  reason: MovementReason;
+  unitCostMinor?: number | null;
+  currency?: string | null;
+  note?: string | null;
+  opKey?: string | undefined;
+}
+
+/** A purchase-order receipt (inbound, costed) posted into a location. */
+export interface ReceiveCommand {
+  variantId: string;
+  locationId: string;
+  quantity: number;
+  unitCostMinor?: number | null;
+  currency?: string | null;
+  refId: string;
+  lineId: string;
+  opKey?: string | undefined;
+}
+
+/** A sales-order shipment (outbound) posted out of a location. */
+export interface ShipCommand {
+  variantId: string;
+  locationId: string;
+  quantity: number;
+  refId: string;
+  lineId: string;
+  opKey?: string | undefined;
+}
+
 /**
  * The inventory write + read use cases. **Only this module writes the ledger.** A manual adjustment appends
  * one immutable `stock_movements` entry and recomputes the `stock_levels` projection in a single unit of
@@ -44,63 +81,113 @@ export class InventoryService {
     private readonly events: InventoryEventPublisher,
   ) {}
 
+  /** Manual adjustment — the operator-facing write (`type=adjustment`, `reason.kind=manual`). */
   async adjust(ctx: ActorContext, input: CreateAdjustmentRequest): Promise<AdjustmentResult> {
+    return this.postMovement(ctx, {
+      variantId: input.variantId,
+      locationId: input.locationId,
+      delta: input.delta,
+      type: 'adjustment',
+      reason: { kind: 'manual', refId: null, lineId: null },
+      unitCostMinor: input.unitCostMinor ?? null,
+      currency: input.currency ?? null,
+      note: input.note ?? null,
+      opKey: input.opKey,
+    });
+  }
+
+  /** Post a purchase-order receipt (inbound, costed) — drives weighted-average valuation. */
+  async receive(ctx: ActorContext, cmd: ReceiveCommand): Promise<AdjustmentResult> {
+    return this.postMovement(ctx, {
+      variantId: cmd.variantId,
+      locationId: cmd.locationId,
+      delta: cmd.quantity,
+      type: 'receipt',
+      reason: { kind: 'purchase_order', refId: cmd.refId, lineId: cmd.lineId },
+      unitCostMinor: cmd.unitCostMinor ?? null,
+      currency: cmd.currency ?? null,
+      note: null,
+      opKey: cmd.opKey,
+    });
+  }
+
+  /** Post a sales-order shipment (outbound) — negative-guarded by the tenant policy. */
+  async ship(ctx: ActorContext, cmd: ShipCommand): Promise<AdjustmentResult> {
+    return this.postMovement(ctx, {
+      variantId: cmd.variantId,
+      locationId: cmd.locationId,
+      delta: -cmd.quantity,
+      type: 'shipment',
+      reason: { kind: 'sales_order', refId: cmd.refId, lineId: cmd.lineId },
+      unitCostMinor: null,
+      currency: null,
+      note: null,
+      opKey: cmd.opKey,
+    });
+  }
+
+  /**
+   * The single ledger-write primitive: every movement (adjust/receipt/shipment/…) flows through here.
+   * Appends one immutable entry and recomputes the projection in one unit of work; enforces the negative
+   * guard, idempotency on `opKey`, and weighted-average valuation on costed inbound deltas.
+   */
+  async postMovement(ctx: ActorContext, cmd: PostMovementCommand): Promise<AdjustmentResult> {
     const org = ctx.organizationId;
-    if (input.delta === 0) throw new ZeroDeltaError();
-    if (!(await this.references.variantExists(org, input.variantId))) {
-      throw new InvalidVariantError(input.variantId);
+    if (cmd.delta === 0) throw new ZeroDeltaError();
+    if (!(await this.references.variantExists(org, cmd.variantId))) {
+      throw new InvalidVariantError(cmd.variantId);
     }
-    if (!(await this.references.locationExists(org, input.locationId))) {
-      throw new InvalidStockLocationError(input.locationId);
+    if (!(await this.references.locationExists(org, cmd.locationId))) {
+      throw new InvalidStockLocationError(cmd.locationId);
     }
 
     // Idempotency: re-posting the same key returns the original movement (no double-post).
-    if (input.opKey) {
-      const existing = await this.movements.findByOpKey(org, input.opKey);
+    if (cmd.opKey) {
+      const existing = await this.movements.findByOpKey(org, cmd.opKey);
       if (existing) {
         const level = await this.requireLevel(org, existing.variantId, existing.locationId);
         return { movement: existing, level };
       }
     }
 
-    const current = await this.levels.findByCell(org, input.variantId, input.locationId);
+    const current = await this.levels.findByCell(org, cmd.variantId, cmd.locationId);
     const prevOnHand = current?.onHand ?? 0;
     const reserved = current?.reserved ?? 0;
-    const newOnHand = prevOnHand + input.delta;
+    const newOnHand = prevOnHand + cmd.delta;
 
     if (newOnHand < 0 && !(await this.policy.allowNegativeStock(org))) {
-      throw new InsufficientStockError(prevOnHand, input.delta);
+      throw new InsufficientStockError(prevOnHand, cmd.delta);
     }
 
     // ── Transaction boundary (Mongoose session, later): ledger append + projection upsert are atomic. ──
     const now = this.clock.now();
-    const costed = input.unitCostMinor != null && input.delta > 0;
-    const movementCurrency = costed ? (input.currency ?? current?.currency ?? null) : null;
+    const costed = cmd.unitCostMinor != null && cmd.delta > 0;
+    const movementCurrency = costed ? (cmd.currency ?? current?.currency ?? null) : null;
 
     const movement = await this.movements.insert({
       id: this.ids.generate(),
       organizationId: org,
-      variantId: input.variantId,
-      locationId: input.locationId,
-      delta: input.delta,
-      type: 'adjustment',
-      reason: { kind: 'manual', refId: null, lineId: null },
-      unitCostMinor: costed ? input.unitCostMinor! : null,
+      variantId: cmd.variantId,
+      locationId: cmd.locationId,
+      delta: cmd.delta,
+      type: cmd.type,
+      reason: cmd.reason,
+      unitCostMinor: costed ? cmd.unitCostMinor! : null,
       currency: movementCurrency,
-      note: input.note ?? null,
-      opKey: input.opKey ?? this.ids.generate(),
+      note: cmd.note ?? null,
+      opKey: cmd.opKey ?? this.ids.generate(),
       createdAt: now,
       createdBy: ctx.actorId,
     });
 
     const avgCostMinor = costed
-      ? this.weightedAverage(prevOnHand, current?.avgCostMinor ?? 0, input.delta, input.unitCostMinor!)
+      ? this.weightedAverage(prevOnHand, current?.avgCostMinor ?? 0, cmd.delta, cmd.unitCostMinor!)
       : (current?.avgCostMinor ?? null);
 
     const level = await this.levels.upsert({
       organizationId: org,
-      variantId: input.variantId,
-      locationId: input.locationId,
+      variantId: cmd.variantId,
+      locationId: cmd.locationId,
       onHand: newOnHand,
       reserved,
       available: newOnHand - reserved,
