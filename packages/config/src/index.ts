@@ -20,6 +20,8 @@ export const EnvSchema = z.object({
   API_PORT: z.coerce.number().int().positive().default(3001),
   /** Comma-separated allow-list of browser origins for CORS (empty = same-origin only). */
   CORS_ORIGINS: z.string().optional(),
+  /** Persistence backend: `memory` (in-process, the default) or `mongo` (Mongoose, requires MONGODB_URI). */
+  PERSISTENCE_DRIVER: z.enum(['memory', 'mongo']).default('memory'),
   MONGODB_URI: z.string().url().optional(),
   REDIS_URL: z.string().url().optional(),
 });

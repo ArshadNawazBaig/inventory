@@ -20,6 +20,7 @@ import type {
   InventoryIdGenerator,
   InventoryPolicyPort,
   InventoryReferencePort,
+  LedgerWriter,
   StockLevelRepository,
   StockMovementRepository,
 } from './ports';
@@ -113,6 +114,7 @@ export class InventoryService {
     private readonly ids: InventoryIdGenerator,
     private readonly clock: InventoryClock,
     private readonly events: InventoryEventPublisher,
+    private readonly ledger: LedgerWriter,
   ) {}
 
   /** Manual adjustment — the operator-facing write (`type=adjustment`, `reason.kind=manual`). */
@@ -257,45 +259,48 @@ export class InventoryService {
       throw new InsufficientStockError(prevOnHand, cmd.delta);
     }
 
-    // ── Transaction boundary (Mongoose session, later): ledger append + projection upsert are atomic. ──
     const now = this.clock.now();
     const costed = cmd.unitCostMinor != null && cmd.delta > 0;
     const movementCurrency = costed ? (cmd.currency ?? current?.currency ?? null) : null;
-
-    const movement = await this.movements.insert({
-      id: this.ids.generate(),
-      organizationId: org,
-      variantId: cmd.variantId,
-      locationId: cmd.locationId,
-      delta: cmd.delta,
-      type: cmd.type,
-      reason: cmd.reason,
-      unitCostMinor: costed ? cmd.unitCostMinor! : null,
-      currency: movementCurrency,
-      note: cmd.note ?? null,
-      opKey: cmd.opKey ?? this.ids.generate(),
-      createdAt: now,
-      createdBy: ctx.actorId,
-    });
 
     const avgCostMinor = costed
       ? this.weightedAverage(prevOnHand, current?.avgCostMinor ?? 0, cmd.delta, cmd.unitCostMinor!)
       : (current?.avgCostMinor ?? null);
 
-    const level = await this.levels.upsert({
-      organizationId: org,
-      variantId: cmd.variantId,
-      locationId: cmd.locationId,
-      onHand: newOnHand,
-      reserved,
-      available: newOnHand - reserved,
-      inTransit: current?.inTransit ?? 0,
-      avgCostMinor,
-      currency: costed ? movementCurrency : (current?.currency ?? null),
-      lastMovementAt: now,
-      createdAt: current?.createdAt ?? now,
-      updatedAt: now,
-    });
+    // ── Atomic unit of work: the immutable ledger append + the projection upsert commit together. The
+    //    Mongoose writer wraps both in a session transaction (DATABASE §11); the in-memory writer sequences
+    //    them. Either way only the ledger writer mutates stock. ──
+    const { movement, level } = await this.ledger.append(
+      {
+        id: this.ids.generate(),
+        organizationId: org,
+        variantId: cmd.variantId,
+        locationId: cmd.locationId,
+        delta: cmd.delta,
+        type: cmd.type,
+        reason: cmd.reason,
+        unitCostMinor: costed ? cmd.unitCostMinor! : null,
+        currency: movementCurrency,
+        note: cmd.note ?? null,
+        opKey: cmd.opKey ?? this.ids.generate(),
+        createdAt: now,
+        createdBy: ctx.actorId,
+      },
+      {
+        organizationId: org,
+        variantId: cmd.variantId,
+        locationId: cmd.locationId,
+        onHand: newOnHand,
+        reserved,
+        available: newOnHand - reserved,
+        inTransit: current?.inTransit ?? 0,
+        avgCostMinor,
+        currency: costed ? movementCurrency : (current?.currency ?? null),
+        lastMovementAt: now,
+        createdAt: current?.createdAt ?? now,
+        updatedAt: now,
+      },
+    );
 
     this.events.publish({
       action: 'movement.posted',

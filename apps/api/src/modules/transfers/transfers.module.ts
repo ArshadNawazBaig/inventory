@@ -5,6 +5,7 @@ import {
   type ResourceClock,
   type ResourceIdGenerator,
 } from '../../common/resource';
+import { CountersModule, mongoFeature, repositoryProvider } from '../../common/persistence';
 import { CatalogModule } from '../catalog/catalog.module';
 import { CatalogQuery } from '../catalog/application/catalog-query.service';
 import { InventoryModule } from '../inventory/inventory.module';
@@ -25,6 +26,8 @@ import {
 import { TransfersService } from './application/transfers.service';
 import { TransfersQuery } from './application/transfers-query.service';
 import { InMemoryTransferRepository } from './infrastructure/in-memory.repository';
+import { MongoTransferRepository } from './infrastructure/mongoose/mongo.repository';
+import { TRANSFER_MODEL, TransferSchema } from './infrastructure/mongoose/schemas';
 import { InventoryStockMover } from './infrastructure/adapters';
 import { TransferController } from './presentation/transfer.controller';
 
@@ -34,10 +37,16 @@ import { TransferController } from './presentation/transfer.controller';
  * bound to in-memory + delegating adapters until the database module lands.
  */
 @Module({
-  imports: [CatalogModule, LocationsModule, InventoryModule],
+  imports: [
+    CatalogModule,
+    LocationsModule,
+    InventoryModule,
+    CountersModule,
+    ...mongoFeature([{ name: TRANSFER_MODEL, schema: TransferSchema }]),
+  ],
   controllers: [TransferController],
   providers: [
-    { provide: TRANSFER_REPOSITORY, useClass: InMemoryTransferRepository },
+    repositoryProvider(TRANSFER_REPOSITORY, InMemoryTransferRepository, MongoTransferRepository),
     { provide: TRANSFERS_STOCK_MOVER, useClass: InventoryStockMover },
     { provide: TRANSFERS_ID_GENERATOR, useValue: new ObjectIdGenerator() },
     { provide: TRANSFERS_CLOCK, useValue: new SystemClock() },

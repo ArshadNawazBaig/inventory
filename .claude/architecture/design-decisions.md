@@ -370,6 +370,32 @@ dependency — is recorded here with context, decision, and consequences.
   members module lands; invoices/payment methods. Permission keys `billing.{view,manage}` to sync into
   AUTHENTICATION §10. Relates to the open "monetization shape" decision (hybrid seats + usage caps).
 
+### ADR-030 — Persistence: Mongoose adapters behind a runtime driver switch
+- Status: Accepted · Context: every module ran on in-memory repositories behind ports — the design always
+  anticipated a Mongoose swap. Time to make persistence real without a risky big-bang rewrite.
+- Decision: introduce a **`PERSISTENCE_DRIVER`** env (`memory` default · `mongo`). A tiny `common/persistence`
+  toolkit drives it: `repositoryProvider(token, Memory, Mongo)` picks the adapter per port, `mongoFeature(...)`
+  registers a module's schemas only in mongo mode, and `mongoRoot()` opens the single `@nestjs/mongoose`
+  connection (from `MONGODB_URI`) only in mongo mode — so the app still boots with **no database** by default.
+  Each module gains a Mongoose adapter implementing the **same port**; the application/contract layers are
+  untouched (dependency inversion paying off). Conventions: **`_id` is the service-generated 24-hex string**
+  (no native-ObjectId conversion; string cross-refs map 1:1), all id/tenant fields are strings, soft-delete via
+  `deletedAt`, uniqueness stays enforced at the service layer (parity with in-memory), and adapters restore
+  entity invariants Mongo doesn't (e.g. empty Mixed objects → `{}`). **Catalog (Product + Variant) is the
+  reference slice.**
+- Consequences: both drivers run in lock-step; the in-memory default keeps the whole suite + smokes green with
+  zero behaviour change, while `PERSISTENCE_DRIVER=mongo` runs on real MongoDB. Verified by a Mongo parity test
+  (the adapters against an ephemeral `mongodb-memory-server`) and a full-stack smoke that **restarts the API
+  process against the same database and reads the data back** (proving real persistence) + cross-tenant 404.
+  `mongodb-memory-server` is a dev/test-only dependency (binary fetched lazily; its install build stays off via
+  `allowBuilds`). Rejected: a big-bang replacement; native-ObjectId `_id` (needless conversion now).
+  **Progress:** Catalog, Purchasing, Sales, Transfers, Returns and Inventory are migrated — the order modules
+  mint sequences from a shared atomic `counters` collection (DATABASE §13.3), and Inventory writes the ledger +
+  projection together through a `LedgerWriter` **session transaction** (DATABASE §11; verified on a replica-set
+  memory server incl. atomic rollback). Follow-ups: fan the adapters out to the remaining cross-cutting modules
+  (Audit, Notifications, Settings, Billing); partial-unique indexes (e.g. live SKU per tenant); production
+  connection/index/migration management.
+
 ## Open decisions (need ratification)
 - Package manager/task runner (pnpm + Turborepo proposed).
 - Inventory valuation method default (weighted-average proposed).

@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common';
 import { ObjectIdGenerator } from '../../common/resource';
+import { mongoFeature, repositoryProvider } from '../../common/persistence';
 import {
   CATALOG_REFERENCE,
   type CatalogReferencePort,
@@ -30,6 +31,16 @@ import {
   InMemoryProductRepository,
   InMemoryVariantRepository,
 } from './infrastructure/in-memory.repositories';
+import {
+  MongoProductRepository,
+  MongoVariantRepository,
+} from './infrastructure/mongoose/mongo.repositories';
+import {
+  PRODUCT_MODEL,
+  ProductSchema,
+  VARIANT_MODEL,
+  VariantSchema,
+} from './infrastructure/mongoose/schemas';
 import { ProductController } from './presentation/product.controller';
 
 /**
@@ -38,11 +49,17 @@ import { ProductController } from './presentation/product.controller';
  * one-line change here — the application layer is untouched (dependency inversion).
  */
 @Module({
-  imports: [CatalogLookupsModule],
+  imports: [
+    CatalogLookupsModule,
+    ...mongoFeature([
+      { name: PRODUCT_MODEL, schema: ProductSchema },
+      { name: VARIANT_MODEL, schema: VariantSchema },
+    ]),
+  ],
   controllers: [ProductController],
   providers: [
-    { provide: PRODUCT_REPOSITORY, useClass: InMemoryProductRepository },
-    { provide: VARIANT_REPOSITORY, useClass: InMemoryVariantRepository },
+    repositoryProvider(PRODUCT_REPOSITORY, InMemoryProductRepository, MongoProductRepository),
+    repositoryProvider(VARIANT_REPOSITORY, InMemoryVariantRepository, MongoVariantRepository),
     { provide: INVENTORY_QUERY, useClass: StubInventoryQuery },
     {
       provide: CATALOG_REFERENCE,

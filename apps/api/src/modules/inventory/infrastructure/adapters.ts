@@ -3,8 +3,15 @@ import { rootLogger } from '../../../common/logging/logger';
 import { CatalogQuery } from '../../catalog/application/catalog-query.service';
 import { LocationQuery } from '../../locations/application/location-query.service';
 import { SettingsQuery } from '../../settings/application/settings-query.service';
-import type { InventoryEvent } from '../domain/entities';
-import type { InventoryEventPublisher, InventoryPolicyPort, InventoryReferencePort } from '../application/ports';
+import type { InventoryEvent, StockLevelEntity, StockMovementEntity } from '../domain/entities';
+import type {
+  InventoryEventPublisher,
+  InventoryPolicyPort,
+  InventoryReferencePort,
+  LedgerWriter,
+  StockLevelRepository,
+  StockMovementRepository,
+} from '../application/ports';
 
 /**
  * Real reference checks — a movement must target a live variant (Catalog) and a live location (Locations),
@@ -45,6 +52,28 @@ export class SettingsInventoryPolicy implements InventoryPolicyPort {
 export class DefaultInventoryPolicy implements InventoryPolicyPort {
   allowNegativeStock(_organizationId: string): Promise<boolean> {
     return Promise.resolve(false);
+  }
+}
+
+/**
+ * In-memory ledger writer — sequences the immutable movement insert + the projection upsert against the two
+ * in-memory repos (single-threaded, so effectively atomic). The Mongoose writer replaces it with a real
+ * session transaction; the application calls `append` identically either way.
+ */
+@Injectable()
+export class InMemoryLedgerWriter implements LedgerWriter {
+  constructor(
+    private readonly movements: StockMovementRepository,
+    private readonly levels: StockLevelRepository,
+  ) {}
+
+  async append(
+    movement: StockMovementEntity,
+    level: StockLevelEntity,
+  ): Promise<{ movement: StockMovementEntity; level: StockLevelEntity }> {
+    const insertedMovement = await this.movements.insert(movement);
+    const upsertedLevel = await this.levels.upsert(level);
+    return { movement: insertedMovement, level: upsertedLevel };
   }
 }
 

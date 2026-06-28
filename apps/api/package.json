@@ -15,10 +15,12 @@
     "@nestjs/common": "^11.0.1",
     "@nestjs/config": "^4.0.0",
     "@nestjs/core": "^11.0.1",
+    "@nestjs/mongoose": "^11.0.4",
     "@nestjs/platform-express": "^11.0.1",
     "@nestjs/swagger": "^11.0.0",
     "@stockflow/config": "workspace:*",
     "@stockflow/types": "workspace:*",
+    "mongoose": "^9.7.3",
     "nestjs-zod": "^4.3.1",
     "pino": "^9.5.0",
     "reflect-metadata": "^0.2.2",
@@ -32,6 +34,7 @@
     "@stockflow/tsconfig": "workspace:*",
     "@types/express": "^5.0.0",
     "@types/node": "^22.10.2",
+    "mongodb-memory-server": "^11.2.0",
     "typescript": "^5.7.2",
     "vitest": "^2.1.9"
   }

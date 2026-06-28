@@ -9,6 +9,7 @@ import {
   NotificationInterceptor,
   TimeoutInterceptor,
 } from './common';
+import { mongoRoot } from './common/persistence';
 import { ConfigModule } from './config';
 import { HealthController } from './health/health.controller';
 import { AuditModule } from './modules/audit/audit.module';
@@ -35,6 +36,7 @@ import { TransfersModule } from './modules/transfers/transfers.module';
 @Module({
   imports: [
     ConfigModule,
+    ...mongoRoot(),
     SettingsModule,
     CatalogLookupsModule,
     CatalogModule,

@@ -5,6 +5,7 @@ import {
   InMemoryStockLevelRepository,
   InMemoryStockMovementRepository,
 } from '../infrastructure/in-memory.repositories';
+import { InMemoryLedgerWriter } from '../infrastructure/adapters';
 import type {
   InventoryClock,
   InventoryEventPublisher,
@@ -79,6 +80,7 @@ function make() {
     new SeqIds(),
     new FixedClock(),
     events,
+    new InMemoryLedgerWriter(movements, levels),
   );
   const query = new InventoryQuery(levels, movements);
   return { movements, levels, references, policy, events, service, query };

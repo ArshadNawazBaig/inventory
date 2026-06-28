@@ -5,6 +5,7 @@ import {
   type ResourceClock,
   type ResourceIdGenerator,
 } from '../../common/resource';
+import { CountersModule, mongoFeature, repositoryProvider } from '../../common/persistence';
 import { CatalogModule } from '../catalog/catalog.module';
 import { CatalogQuery } from '../catalog/application/catalog-query.service';
 import { InventoryModule } from '../inventory/inventory.module';
@@ -28,6 +29,8 @@ import {
 } from './application/ports';
 import { ReturnsService } from './application/returns.service';
 import { InMemoryReturnRepository } from './infrastructure/in-memory.repository';
+import { MongoReturnRepository } from './infrastructure/mongoose/mongo.repository';
+import { RETURN_MODEL, ReturnSchema } from './infrastructure/mongoose/schemas';
 import { InventoryReturnPoster } from './infrastructure/adapters';
 import { ReturnController } from './presentation/return.controller';
 
@@ -37,10 +40,17 @@ import { ReturnController } from './presentation/return.controller';
  * — no cycles. Ports bound to in-memory + delegating adapters until the database module lands.
  */
 @Module({
-  imports: [CatalogModule, PartiesModule, LocationsModule, InventoryModule],
+  imports: [
+    CatalogModule,
+    PartiesModule,
+    LocationsModule,
+    InventoryModule,
+    CountersModule,
+    ...mongoFeature([{ name: RETURN_MODEL, schema: ReturnSchema }]),
+  ],
   controllers: [ReturnController],
   providers: [
-    { provide: RETURN_REPOSITORY, useClass: InMemoryReturnRepository },
+    repositoryProvider(RETURN_REPOSITORY, InMemoryReturnRepository, MongoReturnRepository),
     { provide: RETURNS_POSTER, useClass: InventoryReturnPoster },
     { provide: RETURNS_ID_GENERATOR, useValue: new ObjectIdGenerator() },
     { provide: RETURNS_CLOCK, useValue: new SystemClock() },

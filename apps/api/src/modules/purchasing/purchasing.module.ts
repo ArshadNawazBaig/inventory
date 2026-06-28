@@ -5,6 +5,7 @@ import {
   type ResourceClock,
   type ResourceIdGenerator,
 } from '../../common/resource';
+import { CountersModule, mongoFeature, repositoryProvider } from '../../common/persistence';
 import { CatalogModule } from '../catalog/catalog.module';
 import { CatalogQuery } from '../catalog/application/catalog-query.service';
 import { InventoryModule } from '../inventory/inventory.module';
@@ -29,6 +30,8 @@ import {
 import { PurchasingService } from './application/purchasing.service';
 import { PurchasingQuery } from './application/purchasing-query.service';
 import { InMemoryPurchaseOrderRepository } from './infrastructure/in-memory.repository';
+import { MongoPurchaseOrderRepository } from './infrastructure/mongoose/mongo.repository';
+import { PURCHASE_ORDER_MODEL, PurchaseOrderSchema } from './infrastructure/mongoose/schemas';
 import { InventoryReceiptPoster } from './infrastructure/adapters';
 import { PurchaseOrderController } from './presentation/purchase-order.controller';
 
@@ -38,10 +41,21 @@ import { PurchaseOrderController } from './presentation/purchase-order.controlle
  * in-memory + delegating adapters until the database module lands.
  */
 @Module({
-  imports: [CatalogModule, PartiesModule, LocationsModule, InventoryModule],
+  imports: [
+    CatalogModule,
+    PartiesModule,
+    LocationsModule,
+    InventoryModule,
+    CountersModule,
+    ...mongoFeature([{ name: PURCHASE_ORDER_MODEL, schema: PurchaseOrderSchema }]),
+  ],
   controllers: [PurchaseOrderController],
   providers: [
-    { provide: PURCHASE_ORDER_REPOSITORY, useClass: InMemoryPurchaseOrderRepository },
+    repositoryProvider(
+      PURCHASE_ORDER_REPOSITORY,
+      InMemoryPurchaseOrderRepository,
+      MongoPurchaseOrderRepository,
+    ),
     { provide: PURCHASING_RECEIPT, useClass: InventoryReceiptPoster },
     { provide: PURCHASING_ID_GENERATOR, useValue: new ObjectIdGenerator() },
     { provide: PURCHASING_CLOCK, useValue: new SystemClock() },

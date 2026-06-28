@@ -5,6 +5,7 @@ import {
   type ResourceClock,
   type ResourceIdGenerator,
 } from '../../common/resource';
+import { CountersModule, mongoFeature, repositoryProvider } from '../../common/persistence';
 import { CatalogModule } from '../catalog/catalog.module';
 import { CatalogQuery } from '../catalog/application/catalog-query.service';
 import { InventoryModule } from '../inventory/inventory.module';
@@ -29,6 +30,8 @@ import {
 import { SalesService } from './application/sales.service';
 import { SalesQuery } from './application/sales-query.service';
 import { InMemorySalesOrderRepository } from './infrastructure/in-memory.repository';
+import { MongoSalesOrderRepository } from './infrastructure/mongoose/mongo.repository';
+import { SALES_ORDER_MODEL, SalesOrderSchema } from './infrastructure/mongoose/schemas';
 import { InventoryShipmentPoster } from './infrastructure/adapters';
 import { SalesOrderController } from './presentation/sales-order.controller';
 
@@ -38,10 +41,17 @@ import { SalesOrderController } from './presentation/sales-order.controller';
  * in-memory + delegating adapters until the database module lands.
  */
 @Module({
-  imports: [CatalogModule, PartiesModule, LocationsModule, InventoryModule],
+  imports: [
+    CatalogModule,
+    PartiesModule,
+    LocationsModule,
+    InventoryModule,
+    CountersModule,
+    ...mongoFeature([{ name: SALES_ORDER_MODEL, schema: SalesOrderSchema }]),
+  ],
   controllers: [SalesOrderController],
   providers: [
-    { provide: SALES_ORDER_REPOSITORY, useClass: InMemorySalesOrderRepository },
+    repositoryProvider(SALES_ORDER_REPOSITORY, InMemorySalesOrderRepository, MongoSalesOrderRepository),
     { provide: SALES_SHIPMENT, useClass: InventoryShipmentPoster },
     { provide: SALES_ID_GENERATOR, useValue: new ObjectIdGenerator() },
     { provide: SALES_CLOCK, useValue: new SystemClock() },

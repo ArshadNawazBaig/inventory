@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common';
 import { ObjectIdGenerator, SystemClock } from '../../common/resource';
+import { isMongo, mongoFeature, repositoryProvider } from '../../common/persistence';
 import { CatalogModule } from '../catalog/catalog.module';
 import { CatalogQuery } from '../catalog/application/catalog-query.service';
 import { LocationsModule } from '../locations/locations.module';
@@ -12,6 +13,7 @@ import {
   INVENTORY_ID_GENERATOR,
   INVENTORY_POLICY,
   INVENTORY_REFERENCE,
+  LEDGER_WRITER,
   STOCK_LEVEL_REPOSITORY,
   STOCK_MOVEMENT_REPOSITORY,
   type InventoryClock,
@@ -19,6 +21,7 @@ import {
   type InventoryIdGenerator,
   type InventoryPolicyPort,
   type InventoryReferencePort,
+  type LedgerWriter,
   type StockLevelRepository,
   type StockMovementRepository,
 } from './application/ports';
@@ -30,9 +33,21 @@ import {
 } from './infrastructure/in-memory.repositories';
 import {
   CatalogLocationReference,
+  InMemoryLedgerWriter,
   LoggingInventoryEventPublisher,
   SettingsInventoryPolicy,
 } from './infrastructure/adapters';
+import {
+  MongoStockLevelRepository,
+  MongoStockMovementRepository,
+} from './infrastructure/mongoose/mongo.repositories';
+import { MongoLedgerWriter } from './infrastructure/mongoose/ledger-writer';
+import {
+  LEVEL_MODEL,
+  MOVEMENT_MODEL,
+  StockLevelSchema,
+  StockMovementSchema,
+} from './infrastructure/mongoose/schemas';
 import { InventoryController } from './presentation/inventory.controller';
 
 /**
@@ -43,11 +58,31 @@ import { InventoryController } from './presentation/inventory.controller';
  * (the read-model) for future consumers.
  */
 @Module({
-  imports: [CatalogModule, LocationsModule, SettingsModule],
+  imports: [
+    CatalogModule,
+    LocationsModule,
+    SettingsModule,
+    ...mongoFeature([
+      { name: MOVEMENT_MODEL, schema: StockMovementSchema },
+      { name: LEVEL_MODEL, schema: StockLevelSchema },
+    ]),
+  ],
   controllers: [InventoryController],
   providers: [
-    { provide: STOCK_MOVEMENT_REPOSITORY, useClass: InMemoryStockMovementRepository },
-    { provide: STOCK_LEVEL_REPOSITORY, useClass: InMemoryStockLevelRepository },
+    repositoryProvider(
+      STOCK_MOVEMENT_REPOSITORY,
+      InMemoryStockMovementRepository,
+      MongoStockMovementRepository,
+    ),
+    repositoryProvider(STOCK_LEVEL_REPOSITORY, InMemoryStockLevelRepository, MongoStockLevelRepository),
+    isMongo()
+      ? { provide: LEDGER_WRITER, useClass: MongoLedgerWriter }
+      : {
+          provide: LEDGER_WRITER,
+          inject: [STOCK_MOVEMENT_REPOSITORY, STOCK_LEVEL_REPOSITORY],
+          useFactory: (movements: StockMovementRepository, levels: StockLevelRepository): LedgerWriter =>
+            new InMemoryLedgerWriter(movements, levels),
+        },
     {
       provide: INVENTORY_POLICY,
       inject: [SettingsQuery],
@@ -72,6 +107,7 @@ import { InventoryController } from './presentation/inventory.controller';
         INVENTORY_ID_GENERATOR,
         INVENTORY_CLOCK,
         INVENTORY_EVENT_PUBLISHER,
+        LEDGER_WRITER,
       ],
       useFactory: (
         movements: StockMovementRepository,
@@ -81,8 +117,9 @@ import { InventoryController } from './presentation/inventory.controller';
         ids: InventoryIdGenerator,
         clock: InventoryClock,
         events: InventoryEventPublisher,
+        ledger: LedgerWriter,
       ): InventoryService =>
-        new InventoryService(movements, levels, references, policy, ids, clock, events),
+        new InventoryService(movements, levels, references, policy, ids, clock, events, ledger),
     },
     InventoryQuery,
   ],

@@ -34,6 +34,10 @@ export class AppConfigService {
       .filter((origin) => origin.length > 0);
   }
 
+  get persistenceDriver(): Env['PERSISTENCE_DRIVER'] {
+    return this.env.PERSISTENCE_DRIVER;
+  }
+
   get mongoUri(): string | undefined {
     return this.env.MONGODB_URI;
   }

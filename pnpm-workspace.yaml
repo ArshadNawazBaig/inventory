@@ -3,8 +3,10 @@ packages:
   - "packages/*"
 
 # Native build-script approvals. sharp powers Next.js image optimization;
-# @scarf is telemetry we don't need to build.
+# @scarf is telemetry we don't need to build. mongodb-memory-server (dev/test only)
+# downloads its MongoDB binary lazily at runtime, so its install script stays off.
 allowBuilds:
   sharp: true
   "@scarf/scarf": false
   esbuild: true
+  mongodb-memory-server: false

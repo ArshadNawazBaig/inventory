@@ -36,6 +36,18 @@ export interface StockLevelRepository {
   listAll(organizationId: string): Promise<StockLevelEntity[]>;
 }
 
+/**
+ * The atomic ledger write — appends the immutable movement AND upserts its projection as **one unit of work**
+ * (the golden rule: stock changes go through the ledger inside a transaction). The in-memory writer delegates
+ * to the two repos sequentially; the Mongo writer wraps both in a session transaction (DATABASE §11).
+ */
+export interface LedgerWriter {
+  append(
+    movement: StockMovementEntity,
+    level: StockLevelEntity,
+  ): Promise<{ movement: StockMovementEntity; level: StockLevelEntity }>;
+}
+
 /** Existence checks for the references a movement points at (bound to Catalog + Locations queries). */
 export interface InventoryReferencePort {
   variantExists(organizationId: string, variantId: string): Promise<boolean>;
@@ -62,6 +74,7 @@ export interface InventoryEventPublisher {
 // ─── DI tokens (framework-agnostic symbols; wired in inventory.module.ts) ────────
 export const STOCK_MOVEMENT_REPOSITORY = Symbol('StockMovementRepository');
 export const STOCK_LEVEL_REPOSITORY = Symbol('StockLevelRepository');
+export const LEDGER_WRITER = Symbol('LedgerWriter');
 export const INVENTORY_REFERENCE = Symbol('InventoryReferencePort');
 export const INVENTORY_POLICY = Symbol('InventoryPolicyPort');
 export const INVENTORY_ID_GENERATOR = Symbol('InventoryIdGenerator');
