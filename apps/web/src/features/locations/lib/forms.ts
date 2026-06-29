@@ -1,10 +1,12 @@
 import { z } from 'zod';
 import {
   LOCATION_TYPES,
+  SITE_TYPES,
   type CreateLocationRequest,
   type CreateWarehouseRequest,
   type LocationResponse,
   type LocationType,
+  type SiteType,
   type UpdateLocationRequest,
   type UpdateWarehouseRequest,
   type WarehouseResponse,
@@ -45,9 +47,14 @@ const TYPE_LABELS: Record<LocationType, string> = {
 };
 export const LOCATION_TYPE_OPTIONS = LOCATION_TYPES.map((value) => ({ value, label: TYPE_LABELS[value] }));
 
-// ─── Warehouse ───────────────────────────────────────────────────────────────
+// ─── Warehouse / Store (a "site") ──────────────────────────────────────────────
+/** Selectable site types with display labels (single source: `SITE_TYPES`). */
+const SITE_TYPE_LABELS: Record<SiteType, string> = { warehouse: 'Warehouse', store: 'Store' };
+export const SITE_TYPE_OPTIONS = SITE_TYPES.map((value) => ({ value, label: SITE_TYPE_LABELS[value] }));
+
 export const warehouseFormSchema = z.object({
   name: nameField,
+  type: z.enum(SITE_TYPES),
   code: optionalCode,
   isDefault: z.boolean(),
   address: addressFormSchema,
@@ -55,6 +62,7 @@ export const warehouseFormSchema = z.object({
 export type WarehouseFormValues = z.infer<typeof warehouseFormSchema>;
 export const emptyWarehouseForm: WarehouseFormValues = {
   name: '',
+  type: 'warehouse',
   code: '',
   isDefault: false,
   address: { ...emptyAddressForm },
@@ -63,6 +71,7 @@ export const emptyWarehouseForm: WarehouseFormValues = {
 export function warehouseToForm(warehouse: WarehouseResponse): WarehouseFormValues {
   return {
     name: warehouse.name,
+    type: warehouse.type,
     code: warehouse.code ?? '',
     isDefault: warehouse.isDefault,
     address: addressToForm(warehouse.address),
@@ -70,7 +79,7 @@ export function warehouseToForm(warehouse: WarehouseResponse): WarehouseFormValu
 }
 
 export function toCreateWarehouse(values: WarehouseFormValues): CreateWarehouseRequest {
-  const request: CreateWarehouseRequest = { name: trimmed(values.name) };
+  const request: CreateWarehouseRequest = { name: trimmed(values.name), type: values.type };
   if (trimmed(values.code)) request.code = trimmed(values.code);
   if (values.isDefault) request.isDefault = true;
   const address = addressToInput(values.address);
@@ -81,6 +90,7 @@ export function toCreateWarehouse(values: WarehouseFormValues): CreateWarehouseR
 export function toUpdateWarehouse(values: WarehouseFormValues): UpdateWarehouseRequest {
   return {
     name: trimmed(values.name),
+    type: values.type,
     code: trimmed(values.code) ? trimmed(values.code) : null,
     isDefault: values.isDefault,
     address: addressToInput(values.address) ?? null,

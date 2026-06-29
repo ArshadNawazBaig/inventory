@@ -1,6 +1,8 @@
 # Authentication
 
-> **Status:** 🟡 Seed · **Owner:** Security Engineer · **Related:** [SECURITY.md](../../docs/SECURITY.md) (canonical) · [authorization](./authorization.md) · [secrets](./secrets.md)
+> **Status:** 🟢 Implemented (port-based; Better Auth is the production adapter — see [auth module](../../docs/modules/auth.md) · ADR-031) · **Owner:** Security Engineer · **Related:** [SECURITY.md](../../docs/SECURITY.md) (canonical) · [authorization](./authorization.md) · [secrets](./secrets.md)
+>
+> _Implemented:_ self-serve register/login/accept-invite/logout, opaque **httpOnly session cookies** (SHA-256-hashed at rest, expiry enforced + TTL-pruned), **scrypt** password hashing, and server-derived auth context (never client-trusted). Better Auth will own email verification, password reset (Resend), OAuth/SSO and MFA.
 
 ## Purpose
 Verify identity securely using Better Auth.

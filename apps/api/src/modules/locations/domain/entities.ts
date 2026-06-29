@@ -1,4 +1,4 @@
-import type { LocationType } from '@stockflow/types';
+import type { LocationType, SiteType } from '@stockflow/types';
 import type { Address } from '../../../common/address';
 import type { ResourceEntity } from '../../../common/resource';
 
@@ -7,8 +7,12 @@ import type { ResourceEntity } from '../../../common/resource';
  * location-specific fields. Persistence detail is canonical in DATABASE §5 (ADR-004). Framework-free.
  */
 
-/** A physical site. Keyed by an optional unique `code` per tenant; one warehouse may be the default. */
+/**
+ * A physical site — a `warehouse` (back-stock) or a `store` (retail). Keyed by an optional unique `code` per
+ * tenant; one site may be the default. Stores sell from their locations via Point-of-Sale.
+ */
 export interface WarehouseEntity extends ResourceEntity {
+  type: SiteType;
   code: string | null;
   address: Address | null;
   isDefault: boolean;

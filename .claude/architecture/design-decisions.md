@@ -401,6 +401,58 @@ dependency — is recorded here with context, decision, and consequences.
   migration management; real Stripe behind `BillingProviderPort` (webhooks syncing the `subscriptions`
   singleton).
 
+### ADR-031 — Auth & RBAC: a port-based identity/session/permission backbone (Better Auth later)
+- Status: Accepted · Context: every endpoint carried `@RequirePermission(...)` but nothing enforced it; the
+  `DevAuthGuard` shim trusted client `x-organization-id`/`x-user-id` headers. Time to make authentication +
+  authorization real, for every role, without prematurely coupling to a third-party auth framework.
+- Decision: build an **auth module** (identity · sessions · RBAC) behind ports, exactly like the rest of the
+  codebase. Self-serve **register** creates an Organization + Owner; **login**/**accept-invite** open sessions;
+  **invitations** add members with roles. Sessions are **opaque tokens in httpOnly, SameSite=Lax cookies**,
+  stored only as a SHA-256 hash; passwords use Node's built-in **scrypt** (no new dependency). The atomic
+  **permission catalog** is aggregated in `packages/types` from each module's own `*_PERMISSIONS` (one source,
+  shared API+UI); **seven system roles** bundle permissions, **deny-by-default**, effective permissions = the
+  union. Two global guards replace `DevAuthGuard`: **AuthGuard** (cookie → server-derived
+  `{ organizationId, userId, permissions }`, else 401) then **PermissionGuard** (`@RequirePermission` →
+  granted?, else 403); `@Public()` opts routes out. The guard depends on a `SESSION_AUTHENTICATOR` port in
+  `common` that the module binds to `AuthService`, so `common` never imports a feature module. Repos run on the
+  `PERSISTENCE_DRIVER` switch (in-memory default · Mongoose `mongo`). The web sends `credentials: 'include'`;
+  the tenant is **never** sent by the client.
+- Consequences: the security backbone is real and proven — a mongo-mode HTTP smoke verified the full lifecycle,
+  RBAC enforcement across roles (Owner vs Warehouse Staff: 200/403), invitations, **session revocation on role
+  change/removal**, the **last-Owner** guard, tenant isolation, and **persistence across a process restart**;
+  unit + contract + Mongo-parity tests cover the services, catalog and adapters. Crypto + persistence live
+  behind ports so **Better Auth** becomes the production adapter (email verification, password reset via Resend,
+  OAuth/SSO, MFA) with no application changes. The Owner role is non-assignable via invite/role-change
+  (ownership transfer is a follow-up). Rejected: wiring Better Auth now (heavier, needs real infra, fits the
+  ports pattern awkwardly); JWTs in the browser (opaque server-stored sessions are revocable). Follow-ups:
+  Better Auth; rate-limiting/lockout on auth endpoints; custom + warehouse-scoped roles; a same-origin
+  web→API proxy for first-party cookies + SSR route protection.
+
+### ADR-032 — Stores as a site type + a Point-of-Sale module for retail selling
+- Status: Accepted · Context: the product targets multi-store businesses that sell products, but the app only
+  modelled **warehouses** (back-stock) and **order-based Sales** (B2B: customer-required, draft→fulfil→ship).
+  There was no retail *store* nor a counter *sale*.
+- Decision: (1) **Stores are a `type` on the existing stockable site** (`warehouse` | `store`) — not a new
+  module. A store reuses the site/location/inventory/transfer/report machinery unchanged; the type is the only
+  distinction (so warehouse→store restock is just a transfer, per-store stock + reporting come for free).
+  (2) A new **Point-of-Sale module** sells from a store location in one step: price lines (default from the
+  variant, cashier-overridable), take payment (cash/card/other) with change, and record an immutable receipt
+  (`RC-NNNN` from the shared `counters`). Stock leaves through **Inventory** — the single ledger writer — as one
+  negative-guarded `shipment` movement per line under a **new `pos_sale` reason kind**, idempotency-keyed
+  `pos:<saleId>:<line>`. POS depends one-way on Inventory (reads availability to **pre-validate the basket** so
+  retail never oversells; posts via `postMovement`); no cycle. New permissions `pos.sell`/`pos.view` join the
+  aggregated catalog (Sales/Fulfillment + Warehouse Staff sell; Viewer reads). Runs on the `PERSISTENCE_DRIVER`
+  switch (in-memory · Mongoose `pos_sales`).
+- Consequences: a multi-store business can now sell end-to-end — verified by a replica-set mongo smoke (create a
+  store + location, receive stock, ring up a sale that decrements the ledger transactionally with correct
+  change + receipt, oversell→409, underpayment→400, RBAC pos.view-without-pos.sell→403, and **sale + stock
+  persist across a process restart**) plus service/contract/parity tests. Rejected: a separate Stores module
+  (would duplicate the stockable-site machinery); extending the heavy Sales order lifecycle for walk-ins
+  (a counter sale is one step). Follow-ups: tax/discounts (today total = subtotal), refunds/voids, a true
+  multi-line sale transaction (lines post sequentially after a pre-check today), barcode/receipt hardware, and
+  migrating **Locations (warehouses/stores) + Parties to Mongo** so stores persist under the `mongo` driver
+  (Catalog, the order modules, Inventory, the cross-cutting modules and Auth are already migrated — ADR-030/031).
+
 ## Open decisions (need ratification)
 - Package manager/task runner (pnpm + Turborepo proposed).
 - Inventory valuation method default (weighted-average proposed).

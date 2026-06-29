@@ -4,7 +4,6 @@ import type { ReactNode } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import {
-  Avatar,
   Navbar,
   NavbarActions,
   NavbarSpacer,
@@ -21,15 +20,23 @@ import {
 } from '@stockflow/ui';
 import { ThemeToggle } from '@/components/theme/theme-toggle';
 import { NotificationBell } from '@/features/notifications/components/notification-bell';
+import { UserMenu } from '@/features/auth/components/user-menu';
+import { useSession } from '@/features/auth/use-session';
 import { APP_NAV } from './app-nav';
 
 /**
- * Authenticated application shell — a collapsible Sidebar + top Navbar built
- * entirely from @stockflow/ui. Session enforcement is added in the (app) layout
- * when the auth module lands; this is the chrome every authenticated page renders in.
+ * Authenticated application shell — a collapsible Sidebar + top Navbar built entirely from @stockflow/ui.
+ * Navigation is filtered to the session's effective permissions (a UX mirror; the API still enforces). This is
+ * the chrome every authenticated page renders in.
  */
 export function AppShell({ children }: { children: ReactNode }) {
   const pathname = usePathname();
+  const { data: session } = useSession();
+  const granted = new Set(session?.permissions ?? []);
+  const navGroups = APP_NAV.map((group) => ({
+    ...group,
+    items: group.items.filter((item) => granted.has(item.permission)),
+  })).filter((group) => group.items.length > 0);
 
   return (
     <SidebarProvider className="bg-background text-foreground">
@@ -46,7 +53,7 @@ export function AppShell({ children }: { children: ReactNode }) {
         </SidebarHeader>
 
         <SidebarContent>
-          {APP_NAV.map((group) => (
+          {navGroups.map((group) => (
             <SidebarGroup key={group.title}>
               <SidebarGroupLabel>{group.title}</SidebarGroupLabel>
               <SidebarMenu>
@@ -78,7 +85,7 @@ export function AppShell({ children }: { children: ReactNode }) {
           <NavbarActions>
             <NotificationBell />
             <ThemeToggle />
-            <Avatar size="sm" name="StockFlow Team" />
+            <UserMenu />
           </NavbarActions>
         </Navbar>
         <main className="flex-1 overflow-x-hidden p-6 lg:p-10">{children}</main>

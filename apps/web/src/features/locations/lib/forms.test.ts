@@ -70,6 +70,7 @@ describe('warehouseToForm', () => {
     const warehouse: WarehouseResponse = {
       id: '1',
       name: 'Main',
+      type: 'store',
       code: null,
       address: null,
       isDefault: true,
@@ -79,6 +80,7 @@ describe('warehouseToForm', () => {
     };
     const values = warehouseToForm(warehouse);
     expect(values.code).toBe('');
+    expect(values.type).toBe('store');
     expect(values.isDefault).toBe(true);
     expect(values.address.city).toBe('');
   });

@@ -24,6 +24,10 @@ export const EnvSchema = z.object({
   PERSISTENCE_DRIVER: z.enum(['memory', 'mongo']).default('memory'),
   MONGODB_URI: z.string().url().optional(),
   REDIS_URL: z.string().url().optional(),
+  /** Auth: session cookie lifetime and invitation token lifetime (days), and the web origin for accept links. */
+  SESSION_TTL_DAYS: z.coerce.number().int().positive().default(7),
+  INVITATION_TTL_DAYS: z.coerce.number().int().positive().default(7),
+  WEB_URL: z.string().url().default('http://localhost:3000'),
 });
 
 export type Env = z.infer<typeof EnvSchema>;

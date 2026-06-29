@@ -1,18 +1,39 @@
+import type { Metadata } from 'next';
 import { APP } from '@stockflow/config';
-import { Button, cn } from '@stockflow/ui';
+import {
+  CtaBand,
+  FeatureGrid,
+  Hero,
+  MarketingFooter,
+  MarketingHeader,
+  RolesSection,
+} from '@/features/marketing';
 
+export const metadata: Metadata = {
+  title: `${APP.name} — Enterprise inventory you can trust`,
+  description:
+    'StockFlow is a multi-tenant inventory management platform built on an immutable, fully ' +
+    'audited stock ledger: granular RBAC, purchasing, sales, transfers, returns, real-time ' +
+    'analytics, and a catalog designed for 100k+ SKUs.',
+};
+
+/**
+ * Marketing landing page served at `/`. Fully server-rendered: the header, hero, feature grid,
+ * roles, final CTA, and footer are composed from the `marketing` feature, which builds on the
+ * `@stockflow/ui` primitives and `@stockflow/icons`. All colors come from design tokens, so the
+ * page is correct in both light and dark mode.
+ */
 export default function HomePage() {
   return (
-    <main
-      className={cn(
-        'flex min-h-screen flex-col items-center justify-center gap-4 bg-background p-8 text-foreground',
-      )}
-    >
-      <h1 className="text-3xl font-semibold tracking-tight text-primary">{APP.name}</h1>
-      <p className="text-sm text-muted-foreground">Foundation ready — design tokens wired.</p>
-      <Button asChild>
-        <a href="/playground">View components →</a>
-      </Button>
-    </main>
+    <div className="flex min-h-screen flex-col bg-background text-foreground">
+      <MarketingHeader />
+      <main className="flex-1">
+        <Hero />
+        <FeatureGrid />
+        <RolesSection />
+        <CtaBand />
+      </main>
+      <MarketingFooter />
+    </div>
   );
 }

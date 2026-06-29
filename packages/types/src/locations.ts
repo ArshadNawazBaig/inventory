@@ -22,6 +22,14 @@ export type LocationsPermission =
 export const LOCATION_TYPES = ['zone', 'aisle', 'shelf', 'bin'] as const;
 export type LocationType = (typeof LOCATION_TYPES)[number];
 
+/**
+ * Kind of stockable site. A `warehouse` is back-stock; a `store` is a retail location that sells from its own
+ * stock (the Point-of-Sale sells from a store's locations). Both share the same entity + inventory + transfer
+ * machinery — the type is the only distinction.
+ */
+export const SITE_TYPES = ['warehouse', 'store'] as const;
+export type SiteType = (typeof SITE_TYPES)[number];
+
 // ─── Reusable field schemas ──────────────────────────────────────────────────
 const objectId = z.string().regex(/^[a-fA-F0-9]{24}$/, 'Must be a 24-character hex id');
 const nameField = z.string().trim().min(1, 'Name is required').max(160);
@@ -36,6 +44,7 @@ const codeField = z
 export const CreateWarehouseRequestSchema = z
   .object({
     name: nameField,
+    type: z.enum(SITE_TYPES).optional(),
     code: codeField.optional(),
     address: AddressInputSchema.optional(),
     isDefault: z.boolean().optional(),
@@ -46,6 +55,7 @@ export type CreateWarehouseRequest = z.infer<typeof CreateWarehouseRequestSchema
 export const UpdateWarehouseRequestSchema = z
   .object({
     name: nameField,
+    type: z.enum(SITE_TYPES),
     code: codeField.nullable(),
     address: AddressInputSchema.nullable(),
     isDefault: z.boolean(),
@@ -57,6 +67,7 @@ export type UpdateWarehouseRequest = z.infer<typeof UpdateWarehouseRequestSchema
 export const WarehouseResponseSchema = z.object({
   id: z.string(),
   name: z.string(),
+  type: z.enum(SITE_TYPES),
   code: z.string().nullable(),
   address: AddressSchema.nullable(),
   isDefault: z.boolean(),

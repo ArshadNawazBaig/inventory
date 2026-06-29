@@ -40,6 +40,7 @@ export class WarehouseService extends ResourceService<WarehouseEntity> {
     const created = await this.warehouses.insert({
       ...this.envelope(ctx, this.clock.now()),
       name: normalizeName(input.name),
+      type: input.type ?? 'warehouse',
       code: input.code ?? null,
       address: buildAddress(input.address),
       isDefault,
@@ -58,6 +59,7 @@ export class WarehouseService extends ResourceService<WarehouseEntity> {
     if (input.isDefault === true) await this.clearDefault(ctx, id);
     const patch: Partial<WarehouseEntity> = {};
     if (input.name !== undefined) patch.name = normalizeName(input.name);
+    if (input.type !== undefined) patch.type = input.type;
     if (input.code !== undefined) patch.code = input.code;
     if (input.address !== undefined) patch.address = input.address ? buildAddress(input.address) : null;
     if (input.isDefault !== undefined) patch.isDefault = input.isDefault;

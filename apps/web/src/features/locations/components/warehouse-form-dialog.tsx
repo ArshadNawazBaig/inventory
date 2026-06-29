@@ -3,7 +3,19 @@
 import { useEffect, useId } from 'react';
 import { Controller, useForm, type Path } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Button, Field, FieldControl, Input, Modal, Switch, toast } from '@stockflow/ui';
+import {
+  Button,
+  Field,
+  FieldControl,
+  Input,
+  Modal,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  Switch,
+  toast,
+} from '@stockflow/ui';
 import type { WarehouseResponse } from '@stockflow/types';
 import { errorMessage } from '@/lib/api';
 import { applyApiErrorToForm } from '@/lib/forms';
@@ -11,6 +23,7 @@ import { AddressFields } from '@/components/address-fields';
 import { useCreateResource, useUpdateResource } from '@/features/resources/mutations';
 import { WAREHOUSES } from '../descriptors';
 import {
+  SITE_TYPE_OPTIONS,
   emptyWarehouseForm,
   toCreateWarehouse,
   toUpdateWarehouse,
@@ -70,8 +83,8 @@ export function WarehouseFormDialog({ open, editing, onOpenChange }: WarehouseFo
       open={open}
       onOpenChange={onOpenChange}
       size="lg"
-      title={isEdit ? 'Edit warehouse' : 'New warehouse'}
-      description="A physical site that holds stock."
+      title={isEdit ? 'Edit site' : 'New site'}
+      description="A warehouse (back-stock) or a retail store — both hold stock."
       footer={
         <>
           <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
@@ -95,12 +108,35 @@ export function WarehouseFormDialog({ open, editing, onOpenChange }: WarehouseFo
               <Input autoComplete="off" disabled={isSubmitting} {...register('name')} />
             </FieldControl>
           </Field>
-          <Field label="Code" description="Optional unique key, e.g. WH-MAIN" error={errors.code?.message}>
-            <FieldControl>
-              <Input autoComplete="off" disabled={isSubmitting} {...register('code')} />
-            </FieldControl>
+          <Field
+            label="Type"
+            description="A store sells from its own stock via Point-of-Sale."
+            error={errors.type?.message}
+          >
+            <Controller
+              control={control}
+              name="type"
+              render={({ field }) => (
+                <Select value={field.value} onValueChange={field.onChange} disabled={isSubmitting}>
+                  <SelectTrigger aria-label="Site type" placeholder="Type" />
+                  <SelectContent>
+                    {SITE_TYPE_OPTIONS.map((option) => (
+                      <SelectItem key={option.value} value={option.value}>
+                        {option.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              )}
+            />
           </Field>
         </div>
+
+        <Field label="Code" description="Optional unique key, e.g. WH-MAIN" error={errors.code?.message}>
+          <FieldControl>
+            <Input autoComplete="off" disabled={isSubmitting} {...register('code')} />
+          </FieldControl>
+        </Field>
 
         <Field
           label="Default site"

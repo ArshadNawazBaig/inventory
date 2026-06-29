@@ -94,3 +94,9 @@ export * from './settings';
 
 // Billing (subscription · plan catalog · usage) contracts.
 export * from './billing';
+
+// Point-of-Sale (retail selling at stores) contracts.
+export * from './pos';
+
+// Auth (identity · sessions · RBAC — permissions, roles, members) contracts.
+export * from './auth';

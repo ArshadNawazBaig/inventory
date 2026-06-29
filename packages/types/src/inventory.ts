@@ -32,6 +32,7 @@ export type StockMovementType = (typeof STOCK_MOVEMENT_TYPES)[number];
 export const MOVEMENT_REASON_KINDS = [
   'purchase_order',
   'sales_order',
+  'pos_sale',
   'transfer',
   'return',
   'count',

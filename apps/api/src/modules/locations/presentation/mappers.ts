@@ -7,6 +7,7 @@ export function toWarehouseResponse(entity: WarehouseEntity): WarehouseResponse 
   return {
     id: entity.id,
     name: entity.name,
+    type: entity.type,
     code: entity.code,
     address: entity.address,
     isDefault: entity.isDefault,

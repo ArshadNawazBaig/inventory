@@ -1,3 +1,4 @@
+import './load-env'; // MUST be first — populates process.env before the module graph (driver switch) imports
 import 'reflect-metadata';
 import { VersioningType } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';

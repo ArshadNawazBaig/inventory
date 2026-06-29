@@ -1,6 +1,8 @@
 # Permissions
 
-> **Status:** 🟡 Seed · **Owner:** Security Engineer · **Related:** [rbac](./rbac.md) · [authorization](./authorization.md)
+> **Status:** 🟢 Implemented (catalog aggregated in `packages/types` — see [auth module](../../docs/modules/auth.md) · ADR-031) · **Owner:** Security Engineer · **Related:** [rbac](./rbac.md) · [authorization](./authorization.md)
+>
+> _Implemented:_ each module owns its `*_PERMISSIONS` constant; `packages/types/src/auth.ts` aggregates them into `PERMISSION_CATALOG` (the single source shared by API + UI) and adds `member.*` + `role.*`. The seed table below is the intent; the code is authoritative (e.g. `inventory.view`/`inventory.adjust`, `purchase_order.view`/`.manage`).
 
 ## Purpose
 The atomic permission catalog. Permissions are the unit; roles are bundles of permissions.

@@ -1,6 +1,8 @@
 # Authorization
 
-> **Status:** 🟡 Seed · **Owner:** Security Engineer · **Related:** [rbac](./rbac.md) · [permissions](./permissions.md) · [tenant-isolation](./tenant-isolation.md)
+> **Status:** 🟢 Implemented (global AuthGuard + PermissionGuard, deny-by-default — see [auth module](../../docs/modules/auth.md) · ADR-031) · **Owner:** Security Engineer · **Related:** [rbac](./rbac.md) · [permissions](./permissions.md) · [tenant-isolation](./tenant-isolation.md)
+>
+> _Implemented:_ the **PermissionGuard** enforces each route's `@RequirePermission(...)` against the actor's effective permissions (403 on miss); the **AuthGuard** derives the tenant server-side from the session (401 when absent). Object-level / warehouse-scope checks remain a follow-up.
 
 ## Purpose
 Decide what an authenticated identity is allowed to do — enforced server-side, always.

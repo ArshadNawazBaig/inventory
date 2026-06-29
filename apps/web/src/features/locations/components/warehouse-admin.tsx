@@ -10,8 +10,16 @@ export function WarehouseAdmin() {
   return (
     <ResourceManager<WarehouseResponse>
       descriptor={WAREHOUSES}
-      subtitle="Physical sites that hold stock. Each can have its own location tree."
+      subtitle="Warehouses (back-stock) and stores (retail) — each holds stock and can have its own location tree."
       columns={[
+        {
+          header: 'Type',
+          cell: (warehouse) => (
+            <Badge tone={warehouse.type === 'store' ? 'success' : 'neutral'} appearance="soft">
+              {warehouse.type === 'store' ? 'Store' : 'Warehouse'}
+            </Badge>
+          ),
+        },
         {
           header: 'Code',
           cell: (warehouse) =>

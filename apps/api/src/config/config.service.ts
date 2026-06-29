@@ -45,4 +45,19 @@ export class AppConfigService {
   get redisUrl(): string | undefined {
     return this.env.REDIS_URL;
   }
+
+  /** Session cookie / session lifetime, in milliseconds. */
+  get sessionTtlMs(): number {
+    return this.env.SESSION_TTL_DAYS * 24 * 60 * 60 * 1000;
+  }
+
+  /** Invitation token lifetime, in milliseconds. */
+  get invitationTtlMs(): number {
+    return this.env.INVITATION_TTL_DAYS * 24 * 60 * 60 * 1000;
+  }
+
+  /** Web app origin (no trailing slash) — used to build invitation accept links. */
+  get webBaseUrl(): string {
+    return this.env.WEB_URL.replace(/\/$/, '');
+  }
 }

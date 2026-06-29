@@ -23,6 +23,7 @@ export {
   Building2 as SupplierIcon,
   ShoppingCart as PurchaseOrderIcon,
   ShoppingBag as SalesOrderIcon,
+  Store as PosIcon,
   CreditCard as BillingIcon,
   Truck as ShipmentIcon,
   User as UserIcon,

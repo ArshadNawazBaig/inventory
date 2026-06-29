@@ -53,12 +53,20 @@ describe('WarehouseService', () => {
       address: { line1: '1 Dock Rd', city: 'Ogdenville', country: 'us' },
     });
     expect(created.code).toBe('WH-MAIN');
+    expect(created.type).toBe('warehouse'); // defaults to warehouse
     expect(created.address?.city).toBe('Ogdenville');
     expect(created.address?.country).toBe('US'); // upper-cased
     expect(created.isDefault).toBe(false);
     expect(ctx.events.events).toContainEqual(
       expect.objectContaining({ resource: 'warehouse', action: 'created' }),
     );
+  });
+
+  it('creates a retail store (type=store) and can switch a site type on update', async () => {
+    const store = await ctx.service.create(actor, { name: 'Downtown Store', type: 'store' });
+    expect(store.type).toBe('store');
+    const converted = await ctx.service.update(actor, store.id, { type: 'warehouse' });
+    expect(converted.type).toBe('warehouse');
   });
 
   it('does NOT require unique names but rejects a duplicate code (case-insensitive)', async () => {

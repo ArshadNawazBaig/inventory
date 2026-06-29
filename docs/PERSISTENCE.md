@@ -10,7 +10,8 @@ in-process store or on MongoDB with no changes to services, contracts, or contro
 | `mongo`              | MongoDB via Mongoose | **yes** | staging / production |
 
 Status: **every module is migrated** to Mongoose — the domain modules (Catalog, Purchasing, Sales, Transfers,
-Returns, Inventory) and the cross-cutting ones (Audit, Notifications, Settings, Billing). The order modules
+Returns, Inventory), the cross-cutting ones (Audit, Notifications, Settings, Billing), and **Auth**
+(`organizations`, `users`, `memberships`, `sessions`, `invitations` — sessions carry a Mongo TTL index; ADR-031). The order modules
 mint their document numbers (`PO-`/`SO-`/`TR-`/`RET-`) from a shared atomic **`counters`** collection;
 **Inventory** writes the immutable ledger + projection together through a **session transaction** (the golden
 rule). Audit (`audit_logs`) and Notifications (`notifications`) are per-row collections; Settings

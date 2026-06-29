@@ -2,6 +2,7 @@ import {
   AdjustmentIcon,
   CountIcon,
   type LucideIcon,
+  PosIcon,
   ProductsIcon,
   PurchaseOrderIcon,
   ReturnIcon,
@@ -15,6 +16,7 @@ import type { MovementReasonKind, StockMovementType } from '@stockflow/types';
 const REASON_ICONS: Record<MovementReasonKind, LucideIcon> = {
   purchase_order: PurchaseOrderIcon,
   sales_order: SalesOrderIcon,
+  pos_sale: PosIcon,
   transfer: TransferIcon,
   return: ReturnIcon,
   count: CountIcon,

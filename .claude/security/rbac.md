@@ -1,6 +1,8 @@
 # RBAC
 
-> **Status:** 🟡 Seed · **Owner:** Security Engineer · **Related:** [permissions](./permissions.md) · [authorization](./authorization.md) · [PRD §5](../../docs/PRODUCT_REQUIREMENTS.md)
+> **Status:** 🟢 Implemented (system roles + deny-by-default enforcement — see [auth module](../../docs/modules/auth.md) · ADR-031) · **Owner:** Security Engineer · **Related:** [permissions](./permissions.md) · [authorization](./authorization.md) · [PRD §5](../../docs/PRODUCT_REQUIREMENTS.md)
+>
+> _Implemented:_ the seven system roles below ship in `packages/types` (`SYSTEM_ROLES`), `Membership` carries a member's roles, and effective permissions are the union (deny-by-default). Custom roles, warehouse-scoping, ownership transfer and a platform Super Admin remain follow-ups.
 
 ## Purpose
 Role-Based Access Control: bundle permissions into roles, assign roles to members.

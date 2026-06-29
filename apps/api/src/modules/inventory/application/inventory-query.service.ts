@@ -44,6 +44,12 @@ export class InventoryQuery {
     @Inject(STOCK_MOVEMENT_REPOSITORY) private readonly movements: StockMovementRepository,
   ) {}
 
+  /** Available units of a variant at a single location (0 if untracked) — POS pre-validates a sale with this. */
+  async availableAt(organizationId: string, variantId: string, locationId: string): Promise<number> {
+    const cell = await this.levels.findByCell(organizationId, variantId, locationId);
+    return cell ? cell.available : 0;
+  }
+
   async getVariantStockSummary(organizationId: string, variantId: string): Promise<VariantStockSummary> {
     const cells = await this.levels.listByVariant(organizationId, variantId);
     return cells.reduce<VariantStockSummary>(
