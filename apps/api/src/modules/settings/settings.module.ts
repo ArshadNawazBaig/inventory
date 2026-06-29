@@ -1,4 +1,5 @@
 import { Module } from '@nestjs/common';
+import { mongoFeature, repositoryProvider } from '../../common/persistence';
 import { SystemClock, type ResourceClock } from '../../common/resource';
 import {
   ORGANIZATION_SETTINGS_REPOSITORY,
@@ -8,6 +9,11 @@ import {
 import { SettingsService } from './application/settings.service';
 import { SettingsQuery } from './application/settings-query.service';
 import { InMemoryOrganizationSettingsRepository } from './infrastructure/in-memory.repository';
+import { MongoOrganizationSettingsRepository } from './infrastructure/mongoose/mongo.repository';
+import {
+  ORGANIZATION_SETTINGS_MODEL,
+  OrganizationSettingsSchema,
+} from './infrastructure/mongoose/schemas';
 import { SettingsController } from './presentation/settings.controller';
 
 /**
@@ -17,9 +23,16 @@ import { SettingsController } from './presentation/settings.controller';
  * database module lands.
  */
 @Module({
+  imports: [
+    ...mongoFeature([{ name: ORGANIZATION_SETTINGS_MODEL, schema: OrganizationSettingsSchema }]),
+  ],
   controllers: [SettingsController],
   providers: [
-    { provide: ORGANIZATION_SETTINGS_REPOSITORY, useClass: InMemoryOrganizationSettingsRepository },
+    repositoryProvider(
+      ORGANIZATION_SETTINGS_REPOSITORY,
+      InMemoryOrganizationSettingsRepository,
+      MongoOrganizationSettingsRepository,
+    ),
     { provide: SETTINGS_CLOCK, useValue: new SystemClock() },
     {
       provide: SettingsService,

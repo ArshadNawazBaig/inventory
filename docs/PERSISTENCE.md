@@ -9,11 +9,13 @@ in-process store or on MongoDB with no changes to services, contracts, or contro
 | `memory` (default)   | In-process Maps | no | tests, smokes, local dev, CI |
 | `mongo`              | MongoDB via Mongoose | **yes** | staging / production |
 
-Status: **Catalog, Purchasing, Sales, Transfers, Returns, and Inventory are migrated** to Mongoose. The order
-modules mint their document numbers (`PO-`/`SO-`/`TR-`/`RET-`) from a shared atomic **`counters`** collection;
+Status: **every module is migrated** to Mongoose — the domain modules (Catalog, Purchasing, Sales, Transfers,
+Returns, Inventory) and the cross-cutting ones (Audit, Notifications, Settings, Billing). The order modules
+mint their document numbers (`PO-`/`SO-`/`TR-`/`RET-`) from a shared atomic **`counters`** collection;
 **Inventory** writes the immutable ledger + projection together through a **session transaction** (the golden
-rule). The remaining cross-cutting modules (Audit, Notifications, Settings, Billing) still run in-memory under
-both drivers.
+rule). Audit (`audit_logs`) and Notifications (`notifications`) are per-row collections; Settings
+(`organization_settings`) and Billing (`subscriptions`) are **per-tenant singletons** keyed by
+`_id = organizationId` and upserted. The whole stack now runs on either driver with no application changes.
 
 ## The toolkit (`apps/api/src/common/persistence`)
 - `repositoryProvider(token, MemoryClass, MongoClass)` — binds a repository port to the right adapter for the
@@ -40,7 +42,13 @@ both drivers.
   `{organizationId, opKey}` index is the DB-level idempotency guard. **Transactions need a replica set** —
   production Mongo / `MongoMemoryReplSet` in tests.
 - The adapter **restores entity invariants** Mongo drops — e.g. an empty Mixed object comes back `undefined`,
-  so map it to `{}`.
+  so map it to `{}` (or `null` for the audit diff snapshots).
+- **Per-tenant singletons** (Settings, Billing) have no surrogate id: the tenant *is* the identity, so
+  **`_id = organizationId`** and the mapper reconstructs `organizationId` from `_id` (no duplicate column).
+  Writes are a `findByIdAndUpdate(organizationId, { $set }, { upsert: true })`; the `$set` excludes the
+  identity. A GET still returns ephemeral defaults without persisting (timestamps stay null until first save).
+- **Append-only** collections (Audit) never update or delete, so Mixed change-tracking is never exercised and
+  there is no soft-delete flag.
 
 ## Migrating a module (the repeatable recipe)
 1. **Schemas** — `infrastructure/mongoose/schemas.ts`: a `*Doc` type (the entity with `id`→`_id`) + a
@@ -66,6 +74,7 @@ PERSISTENCE_DRIVER=mongo MONGODB_URI="mongodb://localhost:27017/stockflow" node 
   same database**, and reads the data back (proving real persistence) + cross-tenant 404.
 
 ## Follow-ups
-Migrate the remaining cross-cutting modules (Audit, Notifications, Settings, Billing — all simple
-single-collection or singleton stores); partial-unique indexes (e.g. live SKU per tenant); production
-connection pooling + index/migration management.
+All modules are migrated. Remaining hardening: partial-unique indexes (e.g. live SKU per tenant), a TTL /
+retention policy on `audit_logs` (DATABASE §audit-logs), and production connection pooling + index/migration
+management. Wiring Stripe behind `BillingProviderPort` (with webhooks keeping the `subscriptions` singleton in
+sync) is tracked with the Billing module.

@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common';
 import { NOTIFIER } from '../../common/notifications/notifier';
+import { mongoFeature, repositoryProvider } from '../../common/persistence';
 import {
   ObjectIdGenerator,
   SystemClock,
@@ -14,6 +15,8 @@ import {
 } from './application/ports';
 import { NotificationService } from './application/notification.service';
 import { InMemoryNotificationRepository } from './infrastructure/in-memory.repository';
+import { MongoNotificationRepository } from './infrastructure/mongoose/mongo.repository';
+import { NOTIFICATION_MODEL, NotificationSchema } from './infrastructure/mongoose/schemas';
 import { NotificationController } from './presentation/notification.controller';
 
 /**
@@ -22,9 +25,10 @@ import { NotificationController } from './presentation/notification.controller';
  * `NotificationService`. Depends on no domain module → strictly one-way, no cycles.
  */
 @Module({
+  imports: [...mongoFeature([{ name: NOTIFICATION_MODEL, schema: NotificationSchema }])],
   controllers: [NotificationController],
   providers: [
-    { provide: NOTIFICATION_REPOSITORY, useClass: InMemoryNotificationRepository },
+    repositoryProvider(NOTIFICATION_REPOSITORY, InMemoryNotificationRepository, MongoNotificationRepository),
     { provide: NOTIFICATION_ID_GENERATOR, useValue: new ObjectIdGenerator() },
     { provide: NOTIFICATION_CLOCK, useValue: new SystemClock() },
     {

@@ -9,7 +9,6 @@ import {
   MOVEMENT_MODEL,
   StockLevelSchema,
   StockMovementSchema,
-  levelKey,
   type StockLevelDoc,
   type StockMovementDoc,
 } from './schemas';

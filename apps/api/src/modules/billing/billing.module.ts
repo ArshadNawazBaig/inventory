@@ -1,4 +1,5 @@
 import { Module } from '@nestjs/common';
+import { mongoFeature, repositoryProvider } from '../../common/persistence';
 import { SystemClock, type ResourceClock } from '../../common/resource';
 import { CatalogModule } from '../catalog/catalog.module';
 import { CatalogQuery } from '../catalog/application/catalog-query.service';
@@ -19,6 +20,8 @@ import { BillingService } from './application/billing.service';
 import { BillingQuery } from './application/billing-query.service';
 import { FakeBillingProvider } from './infrastructure/adapters';
 import { InMemorySubscriptionRepository } from './infrastructure/in-memory.repository';
+import { MongoSubscriptionRepository } from './infrastructure/mongoose/mongo.repository';
+import { SUBSCRIPTION_MODEL, SubscriptionSchema } from './infrastructure/mongoose/schemas';
 import { BillingController } from './presentation/billing.controller';
 
 /**
@@ -28,10 +31,14 @@ import { BillingController } from './presentation/billing.controller';
  * (entitlements) for future quota enforcement.
  */
 @Module({
-  imports: [CatalogModule, LocationsModule],
+  imports: [
+    CatalogModule,
+    LocationsModule,
+    ...mongoFeature([{ name: SUBSCRIPTION_MODEL, schema: SubscriptionSchema }]),
+  ],
   controllers: [BillingController],
   providers: [
-    { provide: SUBSCRIPTION_REPOSITORY, useClass: InMemorySubscriptionRepository },
+    repositoryProvider(SUBSCRIPTION_REPOSITORY, InMemorySubscriptionRepository, MongoSubscriptionRepository),
     { provide: BILLING_PROVIDER, useClass: FakeBillingProvider },
     { provide: BILLING_CLOCK, useValue: new SystemClock() },
     {

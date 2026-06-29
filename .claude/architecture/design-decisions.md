@@ -389,12 +389,17 @@ dependency — is recorded here with context, decision, and consequences.
   process against the same database and reads the data back** (proving real persistence) + cross-tenant 404.
   `mongodb-memory-server` is a dev/test-only dependency (binary fetched lazily; its install build stays off via
   `allowBuilds`). Rejected: a big-bang replacement; native-ObjectId `_id` (needless conversion now).
-  **Progress:** Catalog, Purchasing, Sales, Transfers, Returns and Inventory are migrated — the order modules
-  mint sequences from a shared atomic `counters` collection (DATABASE §13.3), and Inventory writes the ledger +
-  projection together through a `LedgerWriter` **session transaction** (DATABASE §11; verified on a replica-set
-  memory server incl. atomic rollback). Follow-ups: fan the adapters out to the remaining cross-cutting modules
-  (Audit, Notifications, Settings, Billing); partial-unique indexes (e.g. live SKU per tenant); production
-  connection/index/migration management.
+  **Progress:** **all modules are migrated.** The domain modules (Catalog, Purchasing, Sales, Transfers,
+  Returns, Inventory) — the order modules mint sequences from a shared atomic `counters` collection
+  (DATABASE §13.3), and Inventory writes the ledger + projection together through a `LedgerWriter` **session
+  transaction** (DATABASE §11; verified on a replica-set memory server incl. atomic rollback) — plus the
+  cross-cutting modules: Audit (`audit_logs`, append-only) and Notifications (`notifications`) as per-row
+  collections, and Settings (`organization_settings`) and Billing (`subscriptions`) as **per-tenant singletons**
+  keyed by `_id = organizationId` and upserted. Each has a Mongo parity test; a mongo-mode boot + process-restart
+  smoke confirmed every `@InjectModel` wiring resolves and singleton/audit writes survive a restart. Follow-ups:
+  partial-unique indexes (e.g. live SKU per tenant); `audit_logs` TTL/retention; production connection/index/
+  migration management; real Stripe behind `BillingProviderPort` (webhooks syncing the `subscriptions`
+  singleton).
 
 ## Open decisions (need ratification)
 - Package manager/task runner (pnpm + Turborepo proposed).
